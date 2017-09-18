@@ -1,5 +1,5 @@
 # Sprints Semanais
 
-Semana 1
+Semana 1 (18/09 - 24/09)
 - Realizar possíveis correções na documentação
-- Elaborar protótipo da dashboard do usuário
+- Definir o product backlog do projeto
