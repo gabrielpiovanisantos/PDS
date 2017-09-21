@@ -10,7 +10,7 @@
   - RF04: O sistema deve ser capaz de ler os dados dos boletos
   - RF05: O sistema deve exibir os boletos por ordem de prioridade de vencimento
   - RF06: O sistema deve mostrar o fluxo de caixa
-  - RF07: O sistema permitir que o usuário altere o estado do boleto manualmente
+  - RF07: O sistema deve permitir que o usuário altere o estado do boleto manualmente
   - RF08: O sistema deve atualizar automaticamente o estado do boleto quando integrado ao banco
   - RF09: O sistema deve permitir o cadastro de usuários
   - RF10: O sistema deve permitir autenticação de usuário
