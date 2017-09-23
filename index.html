@@ -15,9 +15,9 @@
     <!-- Custom fonts for this template -->
     <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
     <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
-    <link href='https://fonts.googleapis.com/css?family=Kaushan+Script' rel='stylesheet' type='text/css'>
-    <link href='https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
-    <link href='https://fonts.googleapis.com/css?family=Roboto+Slab:400,100,300,700' rel='stylesheet' type='text/css'>
+    <link href="https://fonts.googleapis.com/css?family=Kaushan+Script" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic,700italic" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Slab:400,100,300,700" rel="stylesheet" type="text/css">
 
     <!-- Custom styles for this template -->
     <link href="css/agency.css" rel="stylesheet">
@@ -35,7 +35,7 @@
         <div class="collapse navbar-collapse" id="navbarResponsive">
           <ul class="navbar-nav ml-auto">
             <li class="nav-item">
-              <a class="nav-link js-scroll-trigger" href="#services">Cadastrar</a>
+              <a class="nav-link js-scroll-trigger" href="#cadastrar">Cadastrar</a>
             </li>
             <li class="nav-item">
               <a class="nav-link js-scroll-trigger" href="#team">Sobre</a>
@@ -48,28 +48,29 @@
     <header class="masthead">
       <div class="container">
         <div class="card-body">
-          <form>
-            <div class="form-group" style="margin-top: 120px; width: 45%" >
+         <div class="form-group" style="margin-top: 120px; width: 45%" >
+          <form method="post" action="authentication.php">
               <div style="font-family: Kaushan Script; color: #fed136; font-size: 30px;">
                 <label>Login</label>
               </div>
-              <input class="form-control" id="exampleInputEmail1" type="email" aria-describedby="emailHelp" placeholder="Email" style="margin-top: 15px">
-              <input class="form-control" id="exampleInputPassword1" type="password" placeholder="Senha" style="margin-top: 15px">
+              <input class="form-control" id="inputEmail" name="inputEmail" type="email" aria-describedby="emailHelp" placeholder="Email" style="margin-top: 15px">
+              <input class="form-control" id="inputPassword" name="inputPassword" type="password" placeholder="Senha" style="margin-top: 15px">
             <div class="text-center">
               <a class="d-block small" href="forgot-password.html" style="margin-top: 10px; text-align: right;">Esqueceu a senha?</a>
             </div>
-            <a class="btn btn-xl js-scroll-trigger" href="index.html" style="margin-top: 20px;">Entrar</a>
+            <button type="submit" class="btn btn-xl js-scroll-trigger" style="margin-top: 20px;">Entrar</button>
           </form>
           <div>
             <label style="text-align: left; color: white; margin-top: 40px; font-family: 'Kaushan Script'; font-size: 35px;">Ainda não faz parte? Cadastre-se agora!</label>
           </div>
-          <a class="btn btn-xl js-scroll-trigger" href="#services" style="margin-top: 5px; margin-bottom: 10px;">Cadastrar</a>
+          <a class="btn btn-xl js-scroll-trigger" href="#cadastrar" style="margin-top: 5px; margin-bottom: 10px;">Cadastrar</a>
+	    </div>
         </div>
       </div>
     </header>
 
     <!-- Cadastrar -->
-    <section id="services">
+    <section id="cadastrar">
       <div class="container">
         <div class="row">
           <div class="col-lg-12 text-center">
@@ -81,7 +82,8 @@
           <div class="form-group" style="margin-top: 120px; width: 45%" >
             <input class="form-control" id="exampleInputEmail1" type="email" aria-describedby="emailHelp" placeholder="Email" style="margin-top: 15px">
             <input class="form-control" id="exampleInputPassword1" type="password" placeholder="Senha" style="margin-top: 15px">
-          <a class="btn btn-xl js-scroll-trigger" href="index.html" style="margin-top: 20px;">Entrar</a>
+          	<a class="btn btn-xl js-scroll-trigger" href="index.html" style="margin-top: 20px;">Entrar</a>
+		  </div>
         </form>
       </div>
     </section>
