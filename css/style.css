@@ -1,0 +1,13 @@
+input:focus:required:invalid {
+	background-color: #ffdddd;
+}
+
+input:required:valid {
+	background-color: #ddffdd;
+}
+
+.signup-form {
+	margin-top: 120px;
+	max-width: 45%;
+	margin: auto;
+}
