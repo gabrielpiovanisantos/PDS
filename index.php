@@ -59,12 +59,12 @@
 						<div style="font-family: Kaushan Script; color: #fed136; font-size: 30px;">
 							<label>Login</label>
 						</div>
-						<input class="form-control" name="email" type="email" aria-describedby="email" placeholder="Email" style="margin-top: 15px">
-						<input class="form-control" name="senha" type="password" aria-describedby="senha" placeholder="Senha" style="margin-top: 15px">
+						<input class="form-control" name="email" type="email" aria-describedby="email" placeholder="Email" style="margin-top: 20px">
+						<input class="form-control" name="senha" type="password" aria-describedby="senha" placeholder="Senha" style="margin-top: 20px">
 						<button type="submit" class="btn btn-xl js-scroll-trigger" style="margin-top: 20px;">Entrar</button>
 					</form>
 					<div>
-						<label style="text-align: left; color: white; margin-top: 40px; font-family: 'Kaushan Script'; font-size: 35px;">Ainda não faz parte? Cadastre-se agora!</label>
+						<label style="text-align: left; color: white; margin-top: 60px; font-family: 'Kaushan Script'; font-size: 35px;">Ainda não faz parte? Cadastre-se agora!</label>
 					</div>
 					<a class="btn btn-xl js-scroll-trigger" href="#cadastrar" style="margin-top: 5px; margin-bottom: 10px;">Cadastrar</a>
 				</div>
@@ -82,10 +82,10 @@
 					<div class="form-group signup-form">
 						<form method="post" action="includes/signup.inc.php">
 							<input class="form-control" name="nome" type="text" aria-describedby="nome da empresa" placeholder="Nome da Empresa" style="margin-top: 15px" required>
-							<input class="form-control" name="cnpj" type="text" aria-describedby="CNPJ" placeholder="CNPJ (00.000.000/0000-00)" pattern="\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}" style="margin-top: 15px" required>
-							<input class="form-control" name="email" type="email" aria-describedby="email" placeholder="Email" style="margin-top: 15px" required>
-							<input class="form-control" name="senha" type="password" maxlength="20" aria-describedby="senha" placeholder="Senha (até 20 caracteres)" style="margin-top: 15px" required>
-							<button type="submit" class="btn btn-xl js-scroll-trigger" style="margin-top: 20px;">Enviar</button>
+							<input class="form-control" name="cnpj" type="text" aria-describedby="CNPJ" placeholder="CNPJ (00.000.000/0000-00)" pattern="\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}" style="margin-top: 20px" required>
+							<input class="form-control" name="email" type="email" aria-describedby="email" placeholder="Email" style="margin-top: 20px" required>
+							<input class="form-control" name="senha" type="password" maxlength="20" aria-describedby="senha" placeholder="Senha (até 20 caracteres)" style="margin-top: 20px" required>
+							<button type="submit" class="btn btn-xl js-scroll-trigger" style="margin-top: 30px;">Enviar</button>
 						</form>
 					</div>
 				</div>
