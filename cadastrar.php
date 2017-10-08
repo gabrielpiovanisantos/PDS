@@ -45,7 +45,7 @@
 		}
 	?>
 
-	<form action="upload.php" method="post" enctype="multipart/form-data">
+	<form action="cadastrar.php" method="post" enctype="multipart/form-data">
 		<input type="file" required name="arquivo">
 		<button type="submit" name="submit">Salvar</button>
 	</form>
