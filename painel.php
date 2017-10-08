@@ -1016,9 +1016,7 @@
 						<div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
 						<div class="modal-footer">
 							<button class="btn btn-secondary" type="button" data-dismiss="modal">Cancelar</button>
-							<form action="includes/logout.inc.php" method="post">
-								<button class="btn btn-primary" type="submit">Sair</button>
-							</form>
+							<a class="btn btn-primary" href="includes/logout.inc.php">Sair</a>
 						</div>
 					</div>
 				</div>
