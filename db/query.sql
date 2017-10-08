@@ -17,8 +17,11 @@ create table usuarios (
     primary key (id)
 ) default charset = utf8;
 
-insert into usuarios values
-(default, '00.000.000/0001-00', 'Trash Sofware', 'luciane.silva@msn.com', 'senha');
-
-SELECT * FROM usuarios WHERE email = 'luciane.silva@msn.com' AND senha = 'senha';
-SELECT * FROM usuarios;
+create table boletos (
+	id int(11) not null auto_increment,
+    userid int(11) not null,
+    boleto varchar(256) not null,
+    status varchar(256),
+    data datetime not null,
+    primary key (id)
+);

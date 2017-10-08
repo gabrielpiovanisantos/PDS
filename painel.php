@@ -32,6 +32,7 @@
 	</head>
 
 	<body class="fixed-nav sticky-footer bg-dark" id="page-top">
+
 		<!-- Navigation-->
 		<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav">
 			<a class="navbar-brand" href="painel.php">Nome da Aplicação</a>
@@ -47,9 +48,9 @@
           </a>
 					</li>
 					<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Charts">
-						<a class="nav-link" href="#">
+						<a class="nav-link" href="upload.php">
             <i class="fa fa-fw fa-area-chart"></i>
-            <span class="nav-link-text">Charts</span>
+            <span class="nav-link-text">Upload</span>
           </a>
 					</li>
 					<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Tables">
@@ -226,6 +227,16 @@
               </span>
 							</div>
 						</form>
+					</li>
+					<li class="nav-item">
+						<?php
+							if (isset($_SESSION['id'])) {
+								echo "<div class=\"mr-5\" style=\"color: white;\">Bem vindo, {$_SESSION['nome']}!</div>";
+							}
+							else {
+								header("Location: index.php");
+							}
+						?>
 					</li>
 					<li class="nav-item">
 						<a class="nav-link" data-toggle="modal" data-target="#exampleModal">
@@ -1115,7 +1126,9 @@
 						<div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
 						<div class="modal-footer">
 							<button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-							<a class="btn btn-primary" href="includes/logout.inc.php">Logout</a>
+							<form action="includes/logout.inc.php" method="post">
+								<button class="btn btn-primary" type="submit">Logout</button>
+							</form>
 						</div>
 					</div>
 				</div>
