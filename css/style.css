@@ -11,3 +11,12 @@ input:required:valid {
 	max-width: 45%;
 	margin: auto;
 }
+
+.cadastro-form {
+	max-width: 45%;
+	margin: 200px auto;
+}
+
+.item-form {
+	padding: 10px;
+}

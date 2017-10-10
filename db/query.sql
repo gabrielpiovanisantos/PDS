@@ -21,6 +21,7 @@ create table boletos (
 	id int(11) not null auto_increment,
     userid int(11) not null,
     boleto varchar(256) not null,
+    tipo varchar(256) not null,
     status varchar(256),
     data datetime not null,
     primary key (id)
