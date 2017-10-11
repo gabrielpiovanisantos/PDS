@@ -33,43 +33,46 @@
 
 		$text = $pdf->getText();
 		
+		// identifica o numero do boleto
 		preg_match("/\d{5}[.]\d{5}\s\d{5}[.]\d{6}\s\d{5}[.]\d{6}\s\d{1}\s\d{14}/", $text, $resBoleto);
-		$numBoleto = $resBoleto[0];
 		
-		// os 10 ultimos digitos do numero de um boleto representam o valor dele
-		$valor = substr($numBoleto, -10);
-		
-		// conta quantos zeros tem antes do valor do boleto
-		$count = 0;
-		while ($valor[$count] == "0") {
-			$count++;
-		}
-		
-		// exclui os zeros e coloca o ponto da casa decimal
-		$valor = substr($valor, $count);
-		$valor = substr($valor, 0, -2) . "." . substr($valor, -2);
-		
-		// descobre de qual banco é o boleto
-		$banco = substr($numBoleto, 0, 3);
-		
-		// extrai data de validade do boleto
-		preg_match("/(\d{2})\/(\d{2})\/(\d{2,4})/", $text, $dataVencimento);
-		
-		// se o ano não tiver quatro digitos, coloca no formato correto
-		if (strlen($dataVencimento[3]) < 4) {
-			$dataVencimento[3] = "20" . $dataVencimento[3];
-			$dataVencimento[0] = $dataVencimento[1]."/".$dataVencimento[2]."/".$dataVencimento[3];
-		}
-		
-		// coloca no formato aaaa-mm-dd para guardar no banco
-		$dataVencimento = str_replace("/", "-", $dataVencimento[0]);
-		$dataVencimento = date('Y-m-d', strtotime($dataVencimento));
-		
-		// se ocorreu erro, deleta o arquivo enviado
-		if ($erro != false) {
+		// nao foi possivel identificar o numero do boleto
+		if (count($resBoleto) < 1) {
 			unlink($diretorio.$novo_nome);
+			$erro = "Boleto Inválido!";
 		}
 		else {
+			$numBoleto = $resBoleto[0];
+
+			// os 10 ultimos digitos do numero de um boleto representam o valor dele
+			$valor = substr($numBoleto, -10);
+
+			// conta quantos zeros tem antes do valor do boleto
+			$count = 0;
+			while ($valor[$count] == "0") {
+				$count++;
+			}
+
+			// exclui os zeros e coloca o ponto da casa decimal
+			$valor = substr($valor, $count);
+			$valor = substr($valor, 0, -2) . "." . substr($valor, -2);
+
+			// descobre de qual banco é o boleto
+			$banco = substr($numBoleto, 0, 3);
+
+			// extrai data de validade do boleto
+			preg_match("/(\d{2})\/(\d{2})\/(\d{2,4})/", $text, $dataVencimento);
+
+			// se o ano não tiver quatro digitos, coloca no formato correto
+			if (strlen($dataVencimento[3]) < 4) {
+				$dataVencimento[3] = "20" . $dataVencimento[3];
+				$dataVencimento[0] = $dataVencimento[1]."/".$dataVencimento[2]."/".$dataVencimento[3];
+			}
+
+			// coloca no formato aaaa-mm-dd para guardar no banco
+			$dataVencimento = str_replace("/", "-", $dataVencimento[0]);
+			$dataVencimento = date('Y-m-d', strtotime($dataVencimento));
+
 			// insere no banco
 			$sql = "INSERT INTO boletos VALUES (default, '$userid', '$novo_nome', '$numBoleto', '$valor', '$dataVencimento', '$status', '$tipo', '$data');";
 
@@ -272,7 +275,7 @@
 						}
 						
 						if ($erro != false) {
-							echo "<div class=\"alert alert-danger\" role=\"alert\">{$erro}</div>";
+							echo "<div class=\"alert alert-danger\" role=\"alert\">{$erro}</div>"; // boleto invalido
 						}
 					?>
 
