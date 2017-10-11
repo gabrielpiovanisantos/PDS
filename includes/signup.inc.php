@@ -21,6 +21,7 @@
 			$res = mysqli_query($conn, $sql);
 			$row = mysqli_num_rows($res);
 
+			// se o cnpj já estiver cadastrado
 			if ($row > 0) {
 				header("Location: ../index.php?signup=invalidcnpj");
 				exit();
@@ -30,17 +31,18 @@
 				$res = mysqli_query($conn, $sql);
 				$row = mysqli_num_rows($res);
 
+				// se o email já estiver cadastrado
 				if ($row > 0) {
 					header("Location: ../index.php?signup=invalidemail");
 					exit();
 				}
 				else {
-					// codifica a senha
-					$hashSenha = password_hash($senha, PASSWORD_DEFAULT);
-					// insere no banco de dados
-					$sql = "INSERT INTO usuarios VALUES (default, '$cnpj', '$nome', '$email', '$hashSenha');";
+					$hashSenha = password_hash($senha, PASSWORD_DEFAULT); // codifica a senha
 
-					mysqli_query($conn, $sql);
+					// insere no banco de dados
+					$sql = "INSERT INTO usuarios VALUES (default, '$cnpj', '$nome', '$email', '$hashSenha');"; 
+					mysqli_query($conn, $sql); // executa a query
+					
 					header("Location: ../index.php?signup=success");
 
 					exit();

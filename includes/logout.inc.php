@@ -7,6 +7,6 @@
 		exit();
 	}
 	else {
-//		header("Location: ../index.php");
+		header("Location: ../painel.php?logout=failed");
 	}
 ?>

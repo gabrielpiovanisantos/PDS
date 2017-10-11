@@ -3,6 +3,7 @@
 
 	include("includes/conn.inc.php");
 
+	// verifica se o usuario realizou o login
 	if (!isset($_SESSION['id'])) {
 		header("Location: index.php");
 		exit;

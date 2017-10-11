@@ -1,7 +1,9 @@
 <?php
 	session_start();
 	include("includes/conn.inc.php");
+	include("vendor/autoload.php");
 
+	// verifica se o usuário realizou o login
 	if (!isset($_SESSION['id'])) {
 		header("Location: index.php");
 		exit;
@@ -10,16 +12,16 @@
 	$msg = false;
 
 	if (isset($_FILES['arquivo'])) {
-		$novo_nome = md5(time()) . '.pdf';
+		$novo_nome = md5(time()) . '.pdf'; // cria um nome único
 		$diretorio = "upload/";
 
-		move_uploaded_file($_FILES['arquivo']['tmp_name'], $diretorio.$novo_nome);
+		move_uploaded_file($_FILES['arquivo']['tmp_name'], $diretorio.$novo_nome); // move o arquivo para o diretorio /upload
 
 		$userid = $_SESSION['id'];
 
-		$data = date("Y.m.d", time());
+		$data = date("Y.m.d", time()); // pega a data atual
 
-		$sql = "INSERT INTO boletos VALUES (default, '$userid', '$novo_nome', 'Pendente', '$data');";
+		$sql = "INSERT INTO boletos VALUES (default, '$userid', '$novo_nome', 'Pendente', '$data');"; // insere no banco
 
 		if (mysqli_query($conn, $sql)) {
 			$msg = "Aquivo enviado com sucesso!";
@@ -213,10 +215,20 @@
 							<button class="btn btn-primary" type="submit" name="submit">Salvar</button>
 						</div>
 					</div>
+					
 					<?php
 						if ($msg != false) {
-							echo "<div class=\"alert alert-dark\" role=\"alert\">{$msg}</div>";
+							echo "<div class=\"alert alert-dark\" role=\"alert\">{$msg}</div>"; // exibe mensagem de sucesso/erro
 						}
+					
+						echo "<br><h2>Exemplo PDF Parser funcionando</h2><br>";
+					
+						$parser = new \Smalot\PdfParser\Parser();
+						$pdf = $parser->parseFile('upload/boleto.pdf');
+
+						$text = $pdf->getText();
+						echo "<div><p>".$text."</p></div>";
+					
 					?>
 
 				</form>
