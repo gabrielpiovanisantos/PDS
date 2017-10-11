@@ -1,7 +1,8 @@
 TODO
 - verificar se esse mesmo boleto já foi cadastrado
 - verificar se o formato do arquivo é pdf
-- verificar se apenas um arquivo foi selecionado para upload
+- pagina de boletos a pagar
+- fluxo de caixa
 
 DOING
 - pagina de boletos a receber

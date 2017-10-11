@@ -52,8 +52,16 @@
 		// descobre de qual banco é o boleto
 		$banco = substr($numBoleto, 0, 3);
 		
-		// extrai data de validade do boleto e coloca no formato aaaa-mm-dd
-		preg_match("/\d{2}\/\d{2}\/\d+/", $text, $dataVencimento);
+		// extrai data de validade do boleto
+		preg_match("/(\d{2})\/(\d{2})\/(\d{2,4})/", $text, $dataVencimento);
+		
+		// se o ano não tiver quatro digitos, coloca no formato correto
+		if (strlen($dataVencimento[3]) < 4) {
+			$dataVencimento[3] = "20" . $dataVencimento[3];
+			$dataVencimento[0] = $dataVencimento[1]."/".$dataVencimento[2]."/".$dataVencimento[3];
+		}
+		
+		// coloca no formato aaaa-mm-dd para guardar no banco
 		$dataVencimento = str_replace("/", "-", $dataVencimento[0]);
 		$dataVencimento = date('Y-m-d', strtotime($dataVencimento));
 		
