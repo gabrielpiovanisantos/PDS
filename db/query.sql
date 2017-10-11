@@ -20,9 +20,12 @@ create table usuarios (
 create table boletos (
 	id int(11) not null auto_increment,
     userid int(11) not null,
-    boleto varchar(256) not null,
+    nome varchar(256) not null,
+    numero varchar(256) not null,
+    valor double not null,
+    vencimento date not null,
+    status varchar(10) not null,
     tipo varchar(256) not null,
-    status varchar(256),
-    data datetime not null,
+    data date not null,
     primary key (id)
 );

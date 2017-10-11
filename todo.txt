@@ -1,0 +1,12 @@
+TODO
+- verificar se esse mesmo boleto já foi cadastrado
+- verificar se o formato do arquivo é pdf
+- verificar se apenas um arquivo foi selecionado para upload
+
+DOING
+- pagina de boletos a receber
+
+DONE
+- parse do pdf
+- extração das informações do boleto
+- inserção no banco

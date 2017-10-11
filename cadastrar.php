@@ -10,6 +10,7 @@
 	}
 
 	$msg = false;
+	$erro = false;
 
 	if (isset($_FILES['arquivo'])) {
 		$novo_nome = md5(time()) . '.pdf'; // cria um nome único
@@ -17,21 +18,62 @@
 
 		move_uploaded_file($_FILES['arquivo']['tmp_name'], $diretorio.$novo_nome); // move o arquivo para o diretorio /upload
 
+		// id do usuario que está enviando o boleto
 		$userid = $_SESSION['id'];
 
 		$data = date("Y.m.d", time()); // pega a data atual
+		
+		// garante que o usuario não executará nenhum script malicioso no banco de dados
+		$tipo = mysqli_real_escape_string($conn, $_POST['tipoBoleto']); // tipo: despesa ou receita
+		$status = mysqli_real_escape_string($conn, $_POST['status']); // status: pendente ou pago/recebido
+		
+		// pegando dados do boleto
+		$parser = new \Smalot\PdfParser\Parser();
+		$pdf = $parser->parseFile($diretorio.$novo_nome);
 
-		$sql = "INSERT INTO boletos VALUES (default, '$userid', '$novo_nome', 'Pendente', '$data');"; // insere no banco
-
-		if (mysqli_query($conn, $sql)) {
-			$msg = "Aquivo enviado com sucesso!";
+		$text = $pdf->getText();
+		
+		preg_match("/\d{5}[.]\d{5}\s\d{5}[.]\d{6}\s\d{5}[.]\d{6}\s\d{1}\s\d{14}/", $text, $resBoleto);
+		$numBoleto = $resBoleto[0];
+		
+		// os 10 ultimos digitos do numero de um boleto representam o valor dele
+		$valor = substr($numBoleto, -10);
+		
+		// conta quantos zeros tem antes do valor do boleto
+		$count = 0;
+		while ($valor[$count] == "0") {
+			$count++;
+		}
+		
+		// exclui os zeros e coloca o ponto da casa decimal
+		$valor = substr($valor, $count);
+		$valor = substr($valor, 0, -2) . "." . substr($valor, -2);
+		
+		// descobre de qual banco é o boleto
+		$banco = substr($numBoleto, 0, 3);
+		
+		// extrai data de validade do boleto e coloca no formato aaaa-mm-dd
+		preg_match("/\d{2}\/\d{2}\/\d+/", $text, $dataVencimento);
+		$dataVencimento = str_replace("/", "-", $dataVencimento[0]);
+		$dataVencimento = date('Y-m-d', strtotime($dataVencimento));
+		
+		// se ocorreu erro, deleta o arquivo enviado
+		if ($erro != false) {
+			unlink($diretorio.$novo_nome);
 		}
 		else {
-			$msg = "Falha ao enviar o arquivo";
+			// insere no banco
+			$sql = "INSERT INTO boletos VALUES (default, '$userid', '$novo_nome', '$numBoleto', '$valor', '$dataVencimento', '$status', '$tipo', '$data');";
+
+			if (mysqli_query($conn, $sql)) {
+				$msg = "Aquivo enviado com sucesso!";
+			}
+			else {
+				unlink($diretorio.$novo_nome);
+				$msg = "Falha ao enviar o arquivo";
+			}
 		}
-
 	}
-
 ?>
 
 <!DOCTYPE html>
@@ -197,14 +239,14 @@
 							<div class="col-sm-10">
 								<div class="form-check">
 									<label class="form-check-label">
-										<input class="form-check-input" type="radio" name="tipoBoleto" id="tipoReceber" value="receber">
-									  	A Receber
+										<input class="form-check-input" type="radio" name="tipoBoleto" value="Receita" required>
+									  	Receita
 									</label>
 								</div>
 								<div class="form-check">
 									<label class="form-check-label">
-										<input class="form-check-input" type="radio" name="tipoBoleto" id="tipoPagar" value="pagar">
-									  	A Pagar
+										<input class="form-check-input" type="radio" name="tipoBoleto" value="Despesa" required>
+									  	Despesa
 									</label>
 								</div>
 							</div>
@@ -220,15 +262,10 @@
 						if ($msg != false) {
 							echo "<div class=\"alert alert-dark\" role=\"alert\">{$msg}</div>"; // exibe mensagem de sucesso/erro
 						}
-					
-						echo "<br><h2>Exemplo PDF Parser funcionando</h2><br>";
-					
-						$parser = new \Smalot\PdfParser\Parser();
-						$pdf = $parser->parseFile('upload/boleto.pdf');
-
-						$text = $pdf->getText();
-						echo "<div><p>".$text."</p></div>";
-					
+						
+						if ($erro != false) {
+							echo "<div class=\"alert alert-danger\" role=\"alert\">{$erro}</div>";
+						}
 					?>
 
 				</form>
