@@ -48,13 +48,13 @@
 					</a>
 					<ul class="sidenav-second-level collapse" id="collapseExamplePages">
 						<li>
-							<a href="#">Pagos</a>
+							<a href="boletos.php">Todos</a>
 						</li>
 						<li>
-							<a href="#">A receber</a>
+							<a href="receita.php">A receber</a>
 						</li>
 						<li>
-							<a href="#">A pagar</a>
+							<a href="despesa.php">A pagar</a>
 						</li>
 						<li>
 							<a href="cadastrar.php">Cadastrar</a>
@@ -1015,7 +1015,7 @@
 		  <span aria-hidden="true">×</span>
 		</button>
 					</div>
-					<div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+					<div class="modal-body">Clique em "Sair" se deseja encerrar a sessão atual.</div>
 					<div class="modal-footer">
 						<button class="btn btn-secondary" type="button" data-dismiss="modal">Cancelar</button>
 						<form action="includes/logout.inc.php" method="post">

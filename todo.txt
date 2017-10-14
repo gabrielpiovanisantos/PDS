@@ -1,13 +1,14 @@
 TODO
 - verificar se esse mesmo boleto já foi cadastrado
-- verificar se o formato do arquivo é pdf
-- pagina de boletos a pagar
 - fluxo de caixa
+- bloquear acesso direto a pasta upload/
 
 DOING
-- pagina de boletos a receber
+- verificar se o formato do arquivo é pdf
 
 DONE
 - parse do pdf
 - extração das informações do boleto
 - inserção no banco
+- pagina de boletos a receber
+- pagina de boletos a pagar

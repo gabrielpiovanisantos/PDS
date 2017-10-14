@@ -1,91 +1,16 @@
 <?php
 	session_start();
 	include("includes/conn.inc.php");
-	include("vendor/autoload.php");
-
-	// verifica se o usuário realizou o login
+	
+	// verifica se o usuario realizou o login
 	if (!isset($_SESSION['id'])) {
 		header("Location: index.php");
 		exit;
 	}
 
-	$msg = false;
-	$erro = false;
-
-	if (isset($_FILES['arquivo'])) {
-		$novo_nome = md5(time()) . '.pdf'; // cria um nome único
-		$diretorio = "upload/";
-
-		move_uploaded_file($_FILES['arquivo']['tmp_name'], $diretorio.$novo_nome); // move o arquivo para o diretorio /upload
-
-		// id do usuario que está enviando o boleto
-		$userid = $_SESSION['id'];
-
-		$data = date("Y.m.d", time()); // pega a data atual
-		
-		// garante que o usuario não executará nenhum script malicioso no banco de dados
-		$tipo = mysqli_real_escape_string($conn, $_POST['tipoBoleto']); // tipo: despesa ou receita
-		$status = mysqli_real_escape_string($conn, $_POST['status']); // status: pendente ou pago/recebido
-		
-		// pegando dados do boleto
-		$parser = new \Smalot\PdfParser\Parser();
-		$pdf = $parser->parseFile($diretorio.$novo_nome);
-
-		$text = $pdf->getText();
-		
-		// identifica o numero do boleto
-		preg_match("/\d{5}[.]\d{5}\s\d{5}[.]\d{6}\s\d{5}[.]\d{6}\s\d{1}\s\d{14}/", $text, $resBoleto);
-		
-		// nao foi possivel identificar o numero do boleto
-		if (count($resBoleto) < 1) {
-			unlink($diretorio.$novo_nome);
-			$erro = "Boleto Inválido!";
-		}
-		else {
-			$numBoleto = $resBoleto[0];
-
-			// os 10 ultimos digitos do numero de um boleto representam o valor dele
-			$valor = substr($numBoleto, -10);
-
-			// conta quantos zeros tem antes do valor do boleto
-			$count = 0;
-			while ($valor[$count] == "0") {
-				$count++;
-			}
-
-			// exclui os zeros e coloca o ponto da casa decimal
-			$valor = substr($valor, $count);
-			$valor = substr($valor, 0, -2) . "." . substr($valor, -2);
-
-			// descobre de qual banco é o boleto
-			$banco = substr($numBoleto, 0, 3);
-
-			// extrai data de validade do boleto
-			preg_match("/(\d{2})\/(\d{2})\/(\d{2,4})/", $text, $dataVencimento);
-
-			// se o ano não tiver quatro digitos, coloca no formato correto
-			if (strlen($dataVencimento[3]) < 4) {
-				$dataVencimento[3] = "20" . $dataVencimento[3];
-				$dataVencimento[0] = $dataVencimento[1]."/".$dataVencimento[2]."/".$dataVencimento[3];
-			}
-
-			// coloca no formato aaaa-mm-dd para guardar no banco
-			$dataVencimento = str_replace("/", "-", $dataVencimento[0]);
-			$dataVencimento = date('Y-m-d', strtotime($dataVencimento));
-
-			// insere no banco
-			$sql = "INSERT INTO boletos VALUES (default, '$userid', '$novo_nome', '$numBoleto', '$valor', '$dataVencimento', '$status', '$tipo', '$data');";
-
-			if (mysqli_query($conn, $sql)) {
-				$msg = "Aquivo enviado com sucesso!";
-			}
-			else {
-				unlink($diretorio.$novo_nome);
-				$msg = "Falha ao enviar o arquivo";
-			}
-		}
-	}
+	$userid = $_SESSION['id'];
 ?>
+
 
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -224,63 +149,107 @@
 				<li class="breadcrumb-item">
 					<a href="painel.php">Dashboard</a>
 				</li>
-				<li class="breadcrumb-item active">Cadastrar</li>
+				<li class="breadcrumb-item active">Despesa</li>
 			</ol>
 
-			<div class="container cadastro-form">
-				<form action="cadastrar.php" method="post" enctype="multipart/form-data">
-					<div class="form-group row">
-						<label for="arquivo" class="col-sm-2 col-form-label">Boleto</label>
-						<div class="col-sm-10">
-							<input class="form-control-file" type="file" required name="arquivo">
+			<div>
+				<!--	Boletos		-->
+				<div class="card mb-3">
+					<div class="card-header"><i class="fa fa-table"></i> Data Table Example</div>
+					<div class="card-body">
+						<div class="table-responsive">
+							<table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+								<thead>
+									<tr>
+										<th>Nome</th>
+										<th>Valor (R$)</th>
+										<th>Vencimento</th>
+										<th>Status</th>
+										<th>Alterar Status</th>
+									</tr>
+								</thead>
+								<tfoot>
+									<tr>
+										<th>Nome</th>
+										<th>Valor (R$)</th>
+										<th>Vencimento</th>
+										<th>Status</th>
+										<th>Alterar Status</th>
+									</tr>
+								</tfoot>
+								<tbody>
+									<?php
+										// altera o status do boleto selecionado
+										if (isset($_GET['id']) && isset($_GET['status'])) {
+											$id = $_GET['id'];
+											$status = $_GET['status'];
+											
+											if ($status == "Pago") {
+												$sql = "UPDATE boletos SET status='Pago' WHERE id='$id';";
+												mysqli_query($conn, $sql);
+											}
+											else if ($status == "Pendente") {
+												$sql = "UPDATE boletos SET status='Pendente' WHERE id='$id';";
+												mysqli_query($conn, $sql);
+											}
+											else if ($status == "Atrasado") {
+												$sql = "UPDATE boletos SET status='Atrasado' WHERE id='$id';";
+												mysqli_query($conn, $sql);
+											}
+										}										
+									
+										// busca por todos os boletos
+										$sql = "SELECT id, nome, valor, vencimento, status FROM boletos WHERE userid='$userid'";
+									
+										// se a busca retornar resultados
+										if ($res = mysqli_query($conn, $sql)) {
+											// percorre pelos resultados
+											while ($row = mysqli_fetch_assoc($res)) {
+												$vencimento = str_replace("-", "/", $row['vencimento']);
+												$valor = str_replace(".", ",", $row['valor']);
+												
+												// se o valor for inteiro, acrecentamos duas casas decimais
+												if (!strpos($valor, ",")) {
+													$valor .= ",00";
+												}
+												
+												/* se o penultimo caractere for uma virgula, quer dizer que só tem uma casa decimal,
+												   então acrescentamos mais um zero para padronizar duas casas decimais */
+												if (substr($valor, -2, 1) == ",") {
+													$valor .= "0";
+												}
+												
+												// link do boleto
+												$linkPdf = "<a href='upload/".$row['nome']."'>".$row['nome']."</a>";
+												
+												/* links para alterar os status dos boletos.
+												   passa por parametro o id do boleto e o novo status */
+												$alterar = "<div>
+																<i class='fa fa-calendar-check-o' aria-hidden='true'></i>
+																<a href=boletos.php?id=".$row['id']."&status=Pago>Pago</a>
+															</div>
+															<div>
+																<i class='fa fa-calendar-minus-o' aria-hidden='true'></i>
+																<a href=boletos.php?id=".$row['id']."&status=Pendente>Pendente</a>
+															</div>
+															<div>
+																<i class='fa fa-calendar-times-o' aria-hidden='true'></i>
+																<a href=boletos.php?id=".$row['id']."&status=Atrasado>Atrasado</a>
+															</div>";
+												
+												// imprime as linhas da tabela
+												printf("<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>", $linkPdf, $valor, $vencimento, $row['status'], $alterar);
+											}
+											
+											mysqli_free_result($res);
+										}								
+									?>
+								</tbody>
+							</table>
 						</div>
 					</div>
-					<div class="form-group row">
-						<label for="status" class="col-sm-2 col-form-label">Situação</label>
-						<div class="col-sm-10">
-							<select class="form-control" name="status">
-								<option value="Pendente">Pendente</option>
-								<option value="Pago">Pago/Recebido</option>
-							</select>
-						</div>
-					</div>
-					<fieldset class="form-group">
-						<div class="row">
-							<legend class="col-form-legend col-sm-2">Tipo</legend>
-							<div class="col-sm-10">
-								<div class="form-check">
-									<label class="form-check-label">
-										<input class="form-check-input" type="radio" name="tipoBoleto" value="Receita" required>
-									  	Receita
-									</label>
-								</div>
-								<div class="form-check">
-									<label class="form-check-label">
-										<input class="form-check-input" type="radio" name="tipoBoleto" value="Despesa" required>
-									  	Despesa
-									</label>
-								</div>
-							</div>
-						</div>
-					</fieldset>
-					<div class="form-group row">
-						<div class="col-sm-10">
-							<button class="btn btn-primary" type="submit" name="submit">Salvar</button>
-						</div>
-					</div>
-					
-					<?php
-						if ($msg != false) {
-							echo "<div class=\"alert alert-dark\" role=\"alert\">{$msg}</div>"; // exibe mensagem de sucesso/erro
-						}
-						
-						if ($erro != false) {
-							echo "<div class=\"alert alert-danger\" role=\"alert\">{$erro}</div>"; // boleto invalido
-						}
-					?>
-
-				</form>
-
+<!--					<div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div>-->
+				</div>
 			</div>
 
 			<!-- Scroll to Top Button-->
