@@ -4,7 +4,7 @@ TODO
 - cadastro manual de boletos
 
 DOING
-- fluxo de caixa
+
 
 DONE
 - parse do pdf
@@ -15,3 +15,4 @@ DONE
 - alteração do status dos boletos
 - verificar se o formato do arquivo é pdf
 - verificar se esse mesmo boleto já foi cadastrado
+- fluxo de caixa

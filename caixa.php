@@ -149,89 +149,143 @@
 				<li class="breadcrumb-item">
 					<a href="painel.php">Painel</a>
 				</li>
-				<li class="breadcrumb-item active">Despesa</li>
+				<li class="breadcrumb-item active">Fluxo de caixa</li>
 			</ol>
 
 			<div>
-				<!--	Boletos		-->
+				<form class="form-inline" method="post" action="caixa.php">
+					<div class="form-group">
+						<label for="ano">Ano</label>
+						<input type="number" class="form-control mx-sm-3" id="ano" name="ano" maxlength="4">
+					</div>
+					<button type="submit" class="btn btn-primary">Buscar</button>
+				</form>
+				<br>
+				
 				<div class="card mb-3">
-					<div class="card-header"><i class="fa fa-table"></i> Boletos a Pagar</div>
+					<div class="card-header"><i class="fa fa-table"></i> Fluxo de caixa</div>
 					<div class="card-body">
 						<div class="table-responsive">
-							<table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
+							<table class="table table-bordered" width="100%" cellspacing="0">
 								<thead>
 									<tr>
-										<th>Número</th>
-										<th>Valor (R$)</th>
-										<th>Vencimento</th>
-										<th>Status</th>
-										<th>Alterar Status</th>
+										<th></th>
+										<th>Janeiro</th>
+										<th>Fevereiro</th>
+										<th>Março</th>
+										<th>Abril</th>
+										<th>Maio</th>
+										<th>Junho</th>
+										<th>Julho</th>
+										<th>Agosto</th>
+										<th>Setembro</th>
+										<th>Outubro</th>
+										<th>Novembro</th>
+										<th>Dezembro</th>
 									</tr>
 								</thead>
 								<tfoot>
 									<tr>
-										<th>Número</th>
-										<th>Valor (R$)</th>
-										<th>Vencimento</th>
-										<th>Status</th>
-										<th>Alterar Status</th>
+										<th></th>
+										<th>Janeiro</th>
+										<th>Fevereiro</th>
+										<th>Março</th>
+										<th>Abril</th>
+										<th>Maio</th>
+										<th>Junho</th>
+										<th>Julho</th>
+										<th>Agosto</th>
+										<th>Setembro</th>
+										<th>Outubro</th>
+										<th>Novembro</th>
+										<th>Dezembro</th>
 									</tr>
 								</tfoot>
 								<tbody>
-									<?php
-										// altera o status do boleto selecionado
-										if (isset($_GET['id']) && isset($_GET['status'])) {
-											$id = $_GET['id'];
-											$status = mysqli_real_escape_string($conn, $_GET['status']);
-											
-											if ($status == "Pago") {
-												$sql = "UPDATE boletos SET status='Pago' WHERE id='$id';";
-												mysqli_query($conn, $sql);
-											}
-											else if ($status == "Pendente") {
-												$sql = "UPDATE boletos SET status='Pendente' WHERE id='$id';";
-												mysqli_query($conn, $sql);
-											}
-											else if ($status == "Atrasado") {
-												$sql = "UPDATE boletos SET status='Atrasado' WHERE id='$id';";
-												mysqli_query($conn, $sql);
-											}
-										}										
+									<?php							
+										$ano = date("Y"); // pega o ano atual
 									
-										// busca pelos boletos de despesas a pagar
-										$sql = "SELECT id, nome, numero, valor, vencimento, status FROM boletos WHERE userid='$userid' AND tipo='Despesa' AND status='Pendente'";
-									
-										// se a busca retornar resultados
-										if ($res = mysqli_query($conn, $sql)) {
-											// percorre pelos resultados
-											while ($row = mysqli_fetch_assoc($res)) {
-												$vencimento = str_replace("-", "/", $row['vencimento']);
-												$valor = number_format($row['valor'], 2, ",", "");
-												
-												// link do boleto
-												$linkPdf = $row['numero']." <a href='upload/".$row['nome']."'><i class='fa fa-file-pdf-o' aria-hidden='true'></i></a>";
-												
-												/* links para alterar os status dos boletos.
-												   passa por parametro o id do boleto e o novo status */
-												$alterar = "<div>
-																<i class='fa fa-calendar-check-o' aria-hidden='true'></i>
-																<a href=despesa.php?id=".$row['id']."&status=Pago>Pago</a>
-															</div>
-															<div>
-																<i class='fa fa-calendar-minus-o' aria-hidden='true'></i>
-																<a href=despesa.php?id=".$row['id']."&status=Pendente>Pendente</a>
-															</div>
-															<div>
-																<i class='fa fa-calendar-times-o' aria-hidden='true'></i>
-																<a href=despesa.php?id=".$row['id']."&status=Atrasado>Atrasado</a>
-															</div>";
-												
-												// imprime as linhas da tabela
-												printf("<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>", $linkPdf, $valor, $vencimento, $row['status'], $alterar);
+										// se o usuario escolher o ano
+										if (isset($_POST['ano'])) {
+											$ano = $_POST['ano'];
+										}
+																		
+										// calcula as despesas mensais
+										for ($mes = 1; $mes < 13; $mes++) {
+
+											// soma as despesas do ano selecionado agrupadas por mês
+											$sql = "SELECT ano, mes, soma, tipo, status FROM (
+														SELECT YEAR(vencimento) as ano, MONTH(vencimento) as mes, SUM(valor) as soma, tipo, status FROM boletos
+														GROUP BY ano, mes, tipo, status
+													) AS res WHERE ano='$ano' and mes='$mes' and tipo='Despesa' and status='Pago';";
+
+											// executa query
+											$res = mysqli_query($conn, $sql);
+											$numRows = mysqli_num_rows($res);
+
+											// se retornar resultado, guarda a soma do mês correspondente
+											if ($numRows > 0) {
+												$row = mysqli_fetch_assoc($res);
+												$valor = $row['soma'];
 											}
-											
-											mysqli_free_result($res);
-										}								
+											else {
+												$valor = 0.0;
+											}											
+
+											$despesa[$mes] = number_format($valor, 2, ",", "");
+										}
+
+										mysqli_free_result($res);
+									
+										// calcula as receitas mensais
+										for ($mes = 1; $mes < 13; $mes++) {
+
+											// soma as despesas do ano selecionado agrupadas por mês
+											$sql = "SELECT ano, mes, soma, tipo, status FROM (
+														SELECT YEAR(vencimento) as ano, MONTH(vencimento) as mes, SUM(valor) as soma, tipo, status FROM boletos
+														GROUP BY ano, mes, tipo, status
+													) AS res WHERE ano='$ano' and mes='$mes' and tipo='Receita' and status='Pago';";
+
+											// executa query
+											$res = mysqli_query($conn, $sql);
+											$numRows = mysqli_num_rows($res);
+
+											// se retornar resultado, guarda a soma do mês correspondente
+											if ($numRows > 0) {
+												$row = mysqli_fetch_assoc($res);
+												$valor = $row['soma'];
+											}
+											else {
+												$valor = 0.0;
+											}											
+
+											$receita[$mes] = number_format($valor, 2, ',', '');
+										}
+
+										mysqli_free_result($res);
+									
+										// calcula o saldo mensal
+										for ($mes = 1; $mes < 13; $mes++) {
+											$saldo[$mes] = $receita[$mes] - $despesa[$mes];
+											$saldo[$mes] = number_format($saldo[$mes], 2, ',', '');
+										}
+
+										// imprime a tabela
+										printf("<tr class='table-success'>
+													<th scope='row'>Receita</th>
+													<td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td>
+													<td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td>
+												</tr>
+												<tr class='table-danger'>
+													<th scope='row'>Despesa</th>
+													<td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td>
+													<td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td>
+												 </tr>
+												 <tr>
+													<th>Lucro/Prejuízo</th>
+													<td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td>
+													<td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td>
+												 </tr>", $receita[1], $receita[2], $receita[3], $receita[4], $receita[5], $receita[6], $receita[7], $receita[8], $receita[9], $receita[10], $receita[11], $receita[12], $despesa[1], $despesa[2], $despesa[3], $despesa[4], $despesa[5], $despesa[6], $despesa[7], $despesa[8], $despesa[9], $despesa[10], $despesa[11], $despesa[12], $saldo[1], $saldo[2], $saldo[3], $saldo[4], $saldo[5], $saldo[6], $saldo[7], $saldo[8], $saldo[9], $saldo[10], $saldo[11], $saldo[12]);					
 									?>
 								</tbody>
 							</table>

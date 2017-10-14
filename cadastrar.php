@@ -163,7 +163,7 @@
 				</li>
 
 				<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Tables">
-					<a class="nav-link" href="#">
+					<a class="nav-link" href="caixa.php">
 						<i class="fa fa-fw fa-table"></i>
 						<span class="nav-link-text">Fluxo de caixa</span>
 					</a>
@@ -244,7 +244,7 @@
 			<!-- Breadcrumbs-->
 			<ol class="breadcrumb">
 				<li class="breadcrumb-item">
-					<a href="painel.php">Dashboard</a>
+					<a href="painel.php">Painel</a>
 				</li>
 				<li class="breadcrumb-item active">Cadastrar</li>
 			</ol>

@@ -66,7 +66,7 @@
 				</li>
 
 				<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Tables">
-					<a class="nav-link" href="#">
+					<a class="nav-link" href="caixa.php">
 						<i class="fa fa-fw fa-table"></i>
 						<span class="nav-link-text">Fluxo de caixa</span>
 					</a>
@@ -147,7 +147,7 @@
 			<!-- Breadcrumbs-->
 			<ol class="breadcrumb">
 				<li class="breadcrumb-item">
-					<a href="painel.php">Dashboard</a>
+					<a href="painel.php">Painel</a>
 				</li>
 				<li class="breadcrumb-item active">Despesa</li>
 			</ol>
@@ -158,12 +158,13 @@
 					<div class="card-header"><i class="fa fa-table"></i> Boletos</div>
 					<div class="card-body">
 						<div class="table-responsive">
-							<table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+							<table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
 								<thead>
 									<tr>
 										<th>Número</th>
 										<th>Valor (R$)</th>
 										<th>Vencimento</th>
+										<th>Tipo</th>
 										<th>Status</th>
 										<th>Alterar Status</th>
 									</tr>
@@ -173,6 +174,7 @@
 										<th>Número</th>
 										<th>Valor (R$)</th>
 										<th>Vencimento</th>
+										<th>Tipo</th>
 										<th>Status</th>
 										<th>Alterar Status</th>
 									</tr>
@@ -199,25 +201,14 @@
 										}										
 									
 										// busca por todos os boletos
-										$sql = "SELECT id, nome, numero, valor, vencimento, status FROM boletos WHERE userid='$userid'";
+										$sql = "SELECT id, nome, numero, valor, vencimento, tipo, status FROM boletos WHERE userid='$userid'";
 									
 										// se a busca retornar resultados
 										if ($res = mysqli_query($conn, $sql)) {
 											// percorre pelos resultados
 											while ($row = mysqli_fetch_assoc($res)) {
 												$vencimento = str_replace("-", "/", $row['vencimento']);
-												$valor = str_replace(".", ",", $row['valor']);
-												
-												// se o valor for inteiro, acrecentamos duas casas decimais
-												if (!strpos($valor, ",")) {
-													$valor .= ",00";
-												}
-												
-												/* se o penultimo caractere for uma virgula, quer dizer que só tem uma casa decimal,
-												   então acrescentamos mais um zero para padronizar duas casas decimais */
-												if (substr($valor, -2, 1) == ",") {
-													$valor .= "0";
-												}
+												$valor = number_format($row['valor'], 2, ",", "");
 												
 												// link do boleto
 												$linkPdf = $row['numero']." <a href='upload/".$row['nome']."'><i class='fa fa-file-pdf-o' aria-hidden='true'></i></a>";
@@ -238,7 +229,7 @@
 															</div>";
 												
 												// imprime as linhas da tabela
-												printf("<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>", $linkPdf, $valor, $vencimento, $row['status'], $alterar);
+												printf("<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>", $linkPdf, $valor, $vencimento, $row['tipo'], $row['status'], $alterar);
 											}
 											
 											mysqli_free_result($res);
@@ -248,7 +239,6 @@
 							</table>
 						</div>
 					</div>
-<!--					<div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div>-->
 				</div>
 			</div>
 
