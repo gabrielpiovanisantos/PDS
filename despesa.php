@@ -100,7 +100,7 @@
 						</span>
 					</a>
 
-					<div class="dropdown-menu" aria-labelledby="alertsDropdown">
+					<div class="dropdown-menu dropdown-menu-right" aria-labelledby="alertsDropdown">
 						<h6 class="dropdown-header">Notificações:</h6>
 						<div class="dropdown-divider"></div>
 
@@ -155,13 +155,13 @@
 			<div>
 				<!--	Boletos		-->
 				<div class="card mb-3">
-					<div class="card-header"><i class="fa fa-table"></i> Data Table Example</div>
+					<div class="card-header"><i class="fa fa-table"></i> Boletos a Pagar</div>
 					<div class="card-body">
 						<div class="table-responsive">
 							<table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
 								<thead>
 									<tr>
-										<th>Nome</th>
+										<th>Número</th>
 										<th>Valor (R$)</th>
 										<th>Vencimento</th>
 										<th>Status</th>
@@ -170,7 +170,7 @@
 								</thead>
 								<tfoot>
 									<tr>
-										<th>Nome</th>
+										<th>Número</th>
 										<th>Valor (R$)</th>
 										<th>Vencimento</th>
 										<th>Status</th>
@@ -182,7 +182,7 @@
 										// altera o status do boleto selecionado
 										if (isset($_GET['id']) && isset($_GET['status'])) {
 											$id = $_GET['id'];
-											$status = $_GET['status'];
+											$status = mysqli_real_escape_string($conn, $_GET['status']);
 											
 											if ($status == "Pago") {
 												$sql = "UPDATE boletos SET status='Pago' WHERE id='$id';";
@@ -199,7 +199,7 @@
 										}										
 									
 										// busca pelos boletos de despesas a pagar
-										$sql = "SELECT id, nome, valor, vencimento, status FROM boletos WHERE userid='$userid' AND tipo='Despesa' AND status='Pendente'";
+										$sql = "SELECT id, nome, numero, valor, vencimento, status FROM boletos WHERE userid='$userid' AND tipo='Despesa' AND status='Pendente'";
 									
 										// se a busca retornar resultados
 										if ($res = mysqli_query($conn, $sql)) {
@@ -220,7 +220,7 @@
 												}
 												
 												// link do boleto
-												$linkPdf = "<a href='upload/".$row['nome']."'>".$row['nome']."</a>";
+												$linkPdf = $row['numero']." <a href='upload/".$row['nome']."'><i class='fa fa-file-pdf-o' aria-hidden='true'></i></a>";
 												
 												/* links para alterar os status dos boletos.
 												   passa por parametro o id do boleto e o novo status */

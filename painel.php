@@ -97,7 +97,7 @@
 						</span>
 					</a>
 
-					<div class="dropdown-menu" aria-labelledby="alertsDropdown">
+					<div class="dropdown-menu dropdown-menu-right" aria-labelledby="alertsDropdown">
 						<h6 class="dropdown-header">Notificações:</h6>
 						<div class="dropdown-divider"></div>
 

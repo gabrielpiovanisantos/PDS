@@ -11,77 +11,99 @@
 
 	$msg = false;
 	$erro = false;
+	$ext = false;
+	$erroBoleto = false;
 
 	if (isset($_FILES['arquivo'])) {
-		$novo_nome = md5(time()) . '.pdf'; // cria um nome único
-		$diretorio = "upload/";
-
-		move_uploaded_file($_FILES['arquivo']['tmp_name'], $diretorio.$novo_nome); // move o arquivo para o diretorio /upload
-
-		// id do usuario que está enviando o boleto
-		$userid = $_SESSION['id'];
-
-		$data = date("Y.m.d", time()); // pega a data atual
+		$extensao = substr($_FILES['arquivo']['name'], -4);
 		
-		// garante que o usuario não executará nenhum script malicioso no banco de dados
-		$tipo = mysqli_real_escape_string($conn, $_POST['tipoBoleto']); // tipo: despesa ou receita
-		$status = mysqli_real_escape_string($conn, $_POST['status']); // status: pendente ou pago/recebido
-		
-		// pegando dados do boleto
-		$parser = new \Smalot\PdfParser\Parser();
-		$pdf = $parser->parseFile($diretorio.$novo_nome);
-
-		$text = $pdf->getText();
-		
-		// identifica o numero do boleto
-		preg_match("/\d{5}[.]\d{5}\s\d{5}[.]\d{6}\s\d{5}[.]\d{6}\s\d{1}\s\d{14}/", $text, $resBoleto);
-		
-		// nao foi possivel identificar o numero do boleto
-		if (count($resBoleto) < 1) {
-			unlink($diretorio.$novo_nome);
-			$erro = "Boleto Inválido!";
+		// se a extensão não for pdf, exibe erro
+		if ($extensao != ".pdf") {
+			$ext = "Formato de arquivo não suportado.";
 		}
 		else {
-			$numBoleto = $resBoleto[0];
+			
+			$novo_nome = md5(time()) . '.pdf'; // cria um nome único
+			$diretorio = "upload/";
 
-			// os 10 ultimos digitos do numero de um boleto representam o valor dele
-			$valor = substr($numBoleto, -10);
+			move_uploaded_file($_FILES['arquivo']['tmp_name'], $diretorio.$novo_nome); // move o arquivo para o diretorio /upload
 
-			// conta quantos zeros tem antes do valor do boleto
-			$count = 0;
-			while ($valor[$count] == "0") {
-				$count++;
-			}
+			// id do usuario que está enviando o boleto
+			$userid = $_SESSION['id'];
 
-			// exclui os zeros e coloca o ponto da casa decimal
-			$valor = substr($valor, $count);
-			$valor = substr($valor, 0, -2) . "." . substr($valor, -2);
+			$data = date("Y.m.d", time()); // pega a data atual
 
-			// descobre de qual banco é o boleto
-			$banco = substr($numBoleto, 0, 3);
+			// garante que o usuario não executará nenhum script malicioso no banco de dados
+			$tipo = mysqli_real_escape_string($conn, $_POST['tipoBoleto']); // tipo: despesa ou receita
+			$status = mysqli_real_escape_string($conn, $_POST['status']); // status: pendente ou pago/recebido
 
-			// extrai data de validade do boleto
-			preg_match("/(\d{2})\/(\d{2})\/(\d{2,4})/", $text, $dataVencimento);
+			// pegando dados do boleto
+			$parser = new \Smalot\PdfParser\Parser();
+			$pdf = $parser->parseFile($diretorio.$novo_nome);
 
-			// se o ano não tiver quatro digitos, coloca no formato correto
-			if (strlen($dataVencimento[3]) < 4) {
-				$dataVencimento[3] = "20" . $dataVencimento[3];
-				$dataVencimento[0] = $dataVencimento[1]."/".$dataVencimento[2]."/".$dataVencimento[3];
-			}
+			$text = $pdf->getText();
 
-			// coloca no formato aaaa-mm-dd para guardar no banco
-			$dataVencimento = str_replace("/", "-", $dataVencimento[0]);
-			$dataVencimento = date('Y-m-d', strtotime($dataVencimento));
+			// identifica o numero do boleto
+			preg_match("/\d{5}[.]\d{5}\s\d{5}[.]\d{6}\s\d{5}[.]\d{6}\s\d{1}\s\d{14}/", $text, $resBoleto);
 
-			// insere no banco
-			$sql = "INSERT INTO boletos VALUES (default, '$userid', '$novo_nome', '$numBoleto', '$valor', '$dataVencimento', '$status', '$tipo', '$data');";
-
-			if (mysqli_query($conn, $sql)) {
-				$msg = "Aquivo enviado com sucesso!";
+			// nao foi possivel identificar o numero do boleto
+			if (count($resBoleto) < 1) {
+				unlink($diretorio.$novo_nome);
+				$erro = "<strong>Erro!</strong> Boleto inválido.";
 			}
 			else {
-				unlink($diretorio.$novo_nome);
-				$msg = "Falha ao enviar o arquivo";
+				$numBoleto = $resBoleto[0];
+				
+				// verifica de boleto já está cadastrado no banco de dados
+				$sql = "SELECT numero FROM boletos WHERE numero='$numBoleto';";
+				$res = mysqli_query($conn, $sql);
+				$row = mysqli_num_rows($res);
+				
+				// já existe um boleto cadastrado com esse numero
+				if ($row > 0) {
+					$erroBoleto = "<strong>Erro!</strong> Este boleto já está cadastrado.";
+				}
+				else {
+					// os 10 ultimos digitos do numero de um boleto representam o valor dele
+					$valor = substr($numBoleto, -10);
+
+					// conta quantos zeros tem antes do valor do boleto
+					$count = 0;
+					while ($valor[$count] == "0") {
+						$count++;
+					}
+
+					// exclui os zeros e coloca o ponto da casa decimal
+					$valor = substr($valor, $count);
+					$valor = substr($valor, 0, -2) . "." . substr($valor, -2);
+
+					// descobre de qual banco é o boleto
+					$banco = substr($numBoleto, 0, 3);
+
+					// extrai data de validade do boleto
+					preg_match("/(\d{2})\/(\d{2})\/(\d{2,4})/", $text, $dataVencimento);
+
+					// se o ano não tiver quatro digitos, coloca no formato correto
+					if (strlen($dataVencimento[3]) < 4) {
+						$dataVencimento[3] = "20" . $dataVencimento[3];
+						$dataVencimento[0] = $dataVencimento[1]."/".$dataVencimento[2]."/".$dataVencimento[3];
+					}
+
+					// coloca no formato aaaa-mm-dd para guardar no banco
+					$dataVencimento = str_replace("/", "-", $dataVencimento[0]);
+					$dataVencimento = date('Y-m-d', strtotime($dataVencimento));
+
+					// insere no banco
+					$sql = "INSERT INTO boletos VALUES (default, '$userid', '$novo_nome', '$numBoleto', '$valor', '$dataVencimento', '$status', '$tipo', '$data');";
+
+					if (mysqli_query($conn, $sql)) {
+						$msg = "<strong>Sucesso!</strong> Seu boleto foi cadastrado.";
+					}
+					else {
+						unlink($diretorio.$novo_nome);
+						$msg = "<strong>Erro!</strong> Falha ao enviar o arquivo.";
+					}
+				}
 			}
 		}
 	}
@@ -175,7 +197,7 @@
 						</span>
 					</a>
 
-					<div class="dropdown-menu" aria-labelledby="alertsDropdown">
+					<div class="dropdown-menu dropdown-menu-right" aria-labelledby="alertsDropdown">
 						<h6 class="dropdown-header">Notificações:</h6>
 						<div class="dropdown-divider"></div>
 
@@ -240,7 +262,7 @@
 						<div class="col-sm-10">
 							<select class="form-control" name="status">
 								<option value="Pendente">Pendente</option>
-								<option value="Pago">Pago/Recebido</option>
+								<option value="Pago">Pago</option>
 							</select>
 						</div>
 					</div>
@@ -276,6 +298,14 @@
 						
 						if ($erro != false) {
 							echo "<div class=\"alert alert-danger\" role=\"alert\">{$erro}</div>"; // boleto invalido
+						}
+					
+						if ($ext != false) {
+							echo "<div class=\"alert alert-danger\" role=\"alert\">{$ext}</div>"; // formato não supostado
+						}
+					
+						if ($erroBoleto != false) {
+							echo "<div class=\"alert alert-danger\" role=\"alert\">{$erroBoleto}</div>"; // boleto já cadastrado
 						}
 					?>
 
