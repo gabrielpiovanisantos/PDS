@@ -2,6 +2,7 @@ TODO
 - bloquear acesso direto a pasta upload/
 - pegar a data mais próxima depois da palavra "vencimento"
 - cadastro manual de boletos
+- integração com api de boletos
 
 DOING
 

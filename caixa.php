@@ -207,12 +207,86 @@
 									
 										// se o usuario escolher o ano
 										if (isset($_POST['ano'])) {
-											$ano = $_POST['ano'];
-										}
-																		
-										// calcula as despesas mensais
+											$ano = mysqli_real_escape_string($conn, $_POST['ano']);
+										}																																				
 										for ($mes = 1; $mes < 13; $mes++) {
+											
+											$vencimento = sprintf("%04d-%02d-31", $ano, $mes-1);
+											
+											/***** Saldo Inicial *****/
+											
+											$sql_receita = "SELECT SUM(soma) AS saldo FROM (
+																SELECT soma, vencimento, status, tipo FROM (
+																	SELECT vencimento, SUM(valor) as soma, status, tipo FROM boletos
+																	GROUP BY status, vencimento, tipo
+																) AS aux WHERE vencimento < '$vencimento' and status='Pago' and tipo='Receita'
+															) AS resultado;";
+											
+											$res_receita = mysqli_query($conn, $sql_receita);
+											$numRows = mysqli_num_rows($res_receita);
 
+											// se retornar resultado, guarda a receita incial do mês correspondente
+											if ($numRows > 0) {
+												$row = mysqli_fetch_assoc($res_receita);
+												$receitaInicial = $row['saldo'];
+											}
+											else {
+												$receitaInicial = 0.0;
+											}
+											
+											$sql_despesa = "SELECT SUM(soma) AS saldo FROM (
+																SELECT soma, vencimento, status, tipo FROM (
+																	SELECT vencimento, SUM(valor) as soma, status, tipo FROM boletos
+																	GROUP BY status, vencimento, tipo
+																) AS aux WHERE vencimento < '$vencimento' and status='Pago' and tipo='Despesa'
+															) AS resultado;";
+											
+											$res_despesa = mysqli_query($conn, $sql_despesa);
+											$numRows = mysqli_num_rows($res_despesa);
+											
+											// se retornar resultado, guarda a despesa inicial do mês correspondente
+											if ($numRows > 0) {
+												$row = mysqli_fetch_assoc($res_despesa);
+												$despesaInicial = $row['saldo'];
+											}
+											else {
+												$despesaInicial = 0.0;
+											}
+																					
+											$saldoInicial = $receitaInicial-$despesaInicial;
+											$inicial[$mes] = $saldoInicial;
+											
+											/***** Fim Saldo Inicial *****/
+
+											
+											/***** Receitas Mensais *****/
+											
+											// soma as receitas do ano selecionado agrupadas por mês
+											$sql = "SELECT ano, mes, soma, tipo, status FROM (
+														SELECT YEAR(vencimento) as ano, MONTH(vencimento) as mes, SUM(valor) as soma, tipo, status FROM boletos
+														GROUP BY ano, mes, tipo, status
+													) AS res WHERE ano='$ano' and mes='$mes' and tipo='Receita' and status='Pago';";
+
+											// executa query
+											$res = mysqli_query($conn, $sql);
+											$numRows = mysqli_num_rows($res);
+
+											// se retornar resultado, guarda a soma do mês correspondente
+											if ($numRows > 0) {
+												$row = mysqli_fetch_assoc($res);
+												$valor = $row['soma'];
+											}
+											else {
+												$valor = 0.0;
+											}											
+
+											$receita[$mes] = $valor;
+											
+											/***** Fim Receitas Mensais *****/
+											
+											
+											/***** Despesas Mensais *****/
+												
 											// soma as despesas do ano selecionado agrupadas por mês
 											$sql = "SELECT ano, mes, soma, tipo, status FROM (
 														SELECT YEAR(vencimento) as ano, MONTH(vencimento) as mes, SUM(valor) as soma, tipo, status FROM boletos
@@ -232,46 +306,41 @@
 												$valor = 0.0;
 											}											
 
-											$despesa[$mes] = number_format($valor, 2, ",", "");
+											$despesa[$mes] = $valor;
+											
+											/***** Fim Despesas Mensais *****/
 										}
 
 										mysqli_free_result($res);
+										mysqli_free_result($res_receita);
+										mysqli_free_result($res_despesa);
+										
+										
+										/***** Formatação dos numeros e calculo do saldo do mês e do acumulado *****/
 									
-										// calcula as receitas mensais
-										for ($mes = 1; $mes < 13; $mes++) {
-
-											// soma as despesas do ano selecionado agrupadas por mês
-											$sql = "SELECT ano, mes, soma, tipo, status FROM (
-														SELECT YEAR(vencimento) as ano, MONTH(vencimento) as mes, SUM(valor) as soma, tipo, status FROM boletos
-														GROUP BY ano, mes, tipo, status
-													) AS res WHERE ano='$ano' and mes='$mes' and tipo='Receita' and status='Pago';";
-
-											// executa query
-											$res = mysqli_query($conn, $sql);
-											$numRows = mysqli_num_rows($res);
-
-											// se retornar resultado, guarda a soma do mês correspondente
-											if ($numRows > 0) {
-												$row = mysqli_fetch_assoc($res);
-												$valor = $row['soma'];
-											}
-											else {
-												$valor = 0.0;
-											}											
-
-											$receita[$mes] = number_format($valor, 2, ',', '');
-										}
-
-										mysqli_free_result($res);
-									
-										// calcula o saldo mensal
-										for ($mes = 1; $mes < 13; $mes++) {
+										for ($mes = 1; $mes < 13; $mes++) {								
+											// calcula o saldo mensal
 											$saldo[$mes] = $receita[$mes] - $despesa[$mes];
-											$saldo[$mes] = number_format($saldo[$mes], 2, ',', '');
+											$saldo[$mes] = number_format($saldo[$mes], 2, ',', '.');
+											
+											// calcula saldo acumulado
+											$acumulado[$mes] = $inicial[$mes] + $receita[$mes] - $despesa[$mes];
+											$acumulado[$mes] = number_format($acumulado[$mes], 2, ',', '.');
+											
+											$receita[$mes] = number_format($receita[$mes], 2, ',', '.');
+											$despesa[$mes] = number_format($despesa[$mes], 2, ',', '.');
+											
+											$inicial[$mes] = number_format($inicial[$mes], 2, ',', '.');
+											
 										}
-
+									
 										// imprime a tabela
-										printf("<tr class='table-success'>
+										printf("<tr>
+													<th>Saldo Inicial</th>
+													<td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td>
+													<td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td>
+												</tr>
+												<tr class='table-success'>
 													<th scope='row'>Receita</th>
 													<td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td>
 													<td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td>
@@ -285,7 +354,12 @@
 													<th>Lucro/Prejuízo</th>
 													<td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td>
 													<td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td>
-												 </tr>", $receita[1], $receita[2], $receita[3], $receita[4], $receita[5], $receita[6], $receita[7], $receita[8], $receita[9], $receita[10], $receita[11], $receita[12], $despesa[1], $despesa[2], $despesa[3], $despesa[4], $despesa[5], $despesa[6], $despesa[7], $despesa[8], $despesa[9], $despesa[10], $despesa[11], $despesa[12], $saldo[1], $saldo[2], $saldo[3], $saldo[4], $saldo[5], $saldo[6], $saldo[7], $saldo[8], $saldo[9], $saldo[10], $saldo[11], $saldo[12]);					
+												 </tr>
+												 <tr>
+												 	<th>Acumulado</th>
+													<td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td>
+													<td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td>
+												 </tr>", $inicial[1], $inicial[2], $inicial[3], $inicial[4], $inicial[5], $inicial[6], $inicial[7], $inicial[8], $inicial[9], $inicial[10], $inicial[11], $inicial[12], $receita[1], $receita[2], $receita[3], $receita[4], $receita[5], $receita[6], $receita[7], $receita[8], $receita[9], $receita[10], $receita[11], $receita[12], $despesa[1], $despesa[2], $despesa[3], $despesa[4], $despesa[5], $despesa[6], $despesa[7], $despesa[8], $despesa[9], $despesa[10], $despesa[11], $despesa[12], $saldo[1], $saldo[2], $saldo[3], $saldo[4], $saldo[5], $saldo[6], $saldo[7], $saldo[8], $saldo[9], $saldo[10], $saldo[11], $saldo[12], $acumulado[1], $acumulado[2], $acumulado[3], $acumulado[4], $acumulado[5], $acumulado[6], $acumulado[7], $acumulado[8], $acumulado[9], $acumulado[10], $acumulado[11], $acumulado[12]);					
 									?>
 								</tbody>
 							</table>

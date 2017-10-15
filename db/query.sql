@@ -5,8 +5,6 @@ default collate utf8_general_ci;
 
 use pds;
 
-drop table usuarios;
-
 /* cria tabela de usuarios */
 create table usuarios (
 	id int(11) not null auto_increment,
@@ -17,6 +15,7 @@ create table usuarios (
     primary key (id)
 ) default charset = utf8;
 
+/* cria tabela de boletos */
 create table boletos (
 	id int(11) not null auto_increment,
     userid int(11) not null,
