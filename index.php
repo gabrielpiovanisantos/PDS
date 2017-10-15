@@ -12,7 +12,7 @@
 	<meta name="description" content="">
 	<meta name="author" content="">
 
-	<title>Recebiveis</title>
+	<title>Controle de Boletos</title>
 
 	<!-- Bootstrap core CSS -->
 	<link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -33,7 +33,7 @@
 	<!-- Navigation -->
 	<nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="mainNav">
 		<div class="container">
-			<a class="navbar-brand js-scroll-trigger" href="#page-top">Recebiveis</a>
+			<a class="navbar-brand js-scroll-trigger" href="#page-top">Controle de Boletos</a>
 			<button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
           Menu
           <i class="fa fa-bars"></i>
@@ -44,7 +44,7 @@
 						<a class="nav-link js-scroll-trigger" href="#cadastrar">Cadastrar</a>
 					</li>
 					<li class="nav-item">
-						<a class="nav-link js-scroll-trigger" href="#team">Sobre</a>
+						<a class="nav-link js-scroll-trigger" href="#sobre">Sobre</a>
 					</li>
 				</ul>
 			</div>
@@ -64,7 +64,7 @@
 						<button type="submit" class="btn btn-xl js-scroll-trigger" style="margin-top: 20px;">Entrar</button>
 					</form>
 					<div>
-						<label style="text-align: left; color: white; margin-top: 60px; font-family: 'Kaushan Script'; font-size: 35px;">Ainda não faz parte? Cadastre-se agora!</label>
+						<label style="text-align: left; color: white; margin-top: 60px; font-family: 'Kaushan Script'; font-size: 35px;">Ainda não faz parte?</label>
 					</div>
 					<a class="btn btn-xl js-scroll-trigger" href="#cadastrar" style="margin-top: 5px; margin-bottom: 10px;">Cadastrar</a>
 				</div>
@@ -78,8 +78,7 @@
 			<div class="row">
 				<div class="col-lg-12 text-center">
 					<h2 class="section-heading">Cadastrar</h2>
-					<h3 class="section-subheading text-muted">Informe o nome da sua empresa, o CNPJ(no formato adequado), e um email valido e uma senha
-																para login </h3>
+					<h3 class="section-subheading text-muted">Informe o nome da sua empresa, o CNPJ (no formato adequado), um email válido e senha para efetuar o cadastro</h3>
 					<div class="form-group signup-form">
 						<form method="post" action="includes/signup.inc.php">
 							<input class="form-control" name="nome" type="text" aria-describedby="nome da empresa" placeholder="Nome da Empresa" style="margin-top: 15px" required>
@@ -95,14 +94,12 @@
 	</section>
 
 	<!-- Team -->
-	<section class="bg-light" id="team">
+	<section class="bg-light" id="sobre">
 		<div class="container">
 			<div class="row">
 				<div class="col-lg-12 text-center">
 					<h2 class="section-heading">Sobre</h2>
-					<h3 class="section-subheading text-muted">Aplicacão para gerenciamento de recebiveis
-																com uploads de boletos, visualizacão de boletos e seu status
-															   ,e fluxo de caixa</h3>
+					<h3 class="section-subheading text-muted">Aplicacão para gerenciamento de boletos com upload, visualizacão e fluxo de caixa</h3>
 				</div>
 			</div>
 			<div class="row">

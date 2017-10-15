@@ -1,6 +1,6 @@
 <?php
 	session_start();
-	include("includes/conn.inc.php");
+	include_once("includes/conn.inc.php");
 	
 	// verifica se o usuario realizou o login
 	if (!isset($_SESSION['id'])) {
@@ -37,7 +37,7 @@
 <body class="fixed-nav sticky-footer bg-dark" id="page-top">
 	<!-- Navigation-->
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav">
-		<a class="navbar-brand" href="painel.php">Recebiveis</a>
+		<a class="navbar-brand" href="painel.php">Controle de Boletos</a>
 		<button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
 	<span class="navbar-toggler-icon"></span>
 </button>
@@ -54,10 +54,10 @@
 							<a href="boletos.php">Todos</a>
 						</li>
 						<li>
-							<a href="receita.php">A receber</a>
+							<a href="receita.php">A Receber</a>
 						</li>
 						<li>
-							<a href="despesa.php">A pagar</a>
+							<a href="despesa.php">A Pagar</a>
 						</li>
 						<li>
 							<a href="cadastrar.php">Cadastrar</a>
@@ -66,18 +66,20 @@
 				</li>
 
 				<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Tables">
-					<a class="nav-link" href="caixa.php">
+					<a class="nav-link" href="painel.php">
 						<i class="fa fa-fw fa-table"></i>
-						<span class="nav-link-text">Fluxo de caixa</span>
+						<span class="nav-link-text">Fluxo de Caixa</span>
 					</a>
 				</li>
 
+<!--
 				<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Charts">
 					<a class="nav-link" href="#">
 						<i class="fa fa-fw fa-area-chart"></i>
 						<span class="nav-link-text">Gráficos</span>
 					</a>
 				</li>
+-->
 			</ul>
 
 			<ul class="navbar-nav sidenav-toggler">
@@ -89,6 +91,7 @@
 			</ul>
 
 			<ul class="navbar-nav ml-auto">
+<!--
 				<li class="nav-item dropdown">
 					<a class="nav-link dropdown-toggle mr-lg-2" id="alertsDropdown" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 						<i class="fa fa-fw fa-bell"></i>
@@ -134,6 +137,7 @@
 						<a class="dropdown-item small" href="#">Ver todas as notificações</a>
 					</div>
 				</li>
+-->
 
 				<li class="nav-item">
 					<a class="nav-link" data-toggle="modal" data-target="#exampleModal"><i class="fa fa-fw fa-sign-out"></i>Sair</a>
@@ -206,7 +210,7 @@
 											// percorre pelos resultados
 											while ($row = mysqli_fetch_assoc($res)) {
 												$vencimento = str_replace("-", "/", $row['vencimento']);
-												$valor = number_format($row['valor'], 2, ",", "");
+												$valor = number_format($row['valor'], 2, ",", ".");
 												
 												// link do boleto
 												$linkPdf = $row['numero']." <a href='upload/".$row['nome']."'><i class='fa fa-file-pdf-o' aria-hidden='true'></i></a>";
@@ -280,6 +284,15 @@
 		<!-- Custom scripts for this page-->
 		<script src="js/sb-admin-datatables.min.js"></script>
 		<script src="js/sb-admin-charts.min.js"></script>
+		
+		<script>
+			$('#dataTable').dataTable( {
+			  "columnDefs": [ {
+				  "targets": 1,
+				  "orderable": false
+				} ]
+			} );
+		</script>
 	</div>
 </body>
 

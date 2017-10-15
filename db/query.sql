@@ -20,7 +20,7 @@ create table boletos (
 	id int(11) not null auto_increment,
     userid int(11) not null,
     nome varchar(256) not null,
-    numero varchar(256) not null unique,
+    numero varchar(256) not null,
     valor double not null,
     vencimento date not null,
     status varchar(10) not null,
