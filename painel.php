@@ -147,8 +147,8 @@ if ($numRows > 0) {
 						</a>
 
 						<div class="dropdown-divider"></div>
-						<a class="dropdown-item" href="#"> <span class="text-success"> <strong><i
-									class="fa fa-long-arrow-up fa-fw"></i>encode_Boletos próximos do
+						<a class="dropdown-item" href="#"> <span class="text-warning"> <strong><i
+									class="fa fa-long-arrow-up fa-fw"></i>Boletos próximos do
 									vencimento</strong>
 						</span>
 							<div class="dropdown-message small">Voce tem <?php print_r($prestesAVencer)?> boletos prestes a vencer.</div>
