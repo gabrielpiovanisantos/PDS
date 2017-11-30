@@ -13,11 +13,14 @@ $userid = $_SESSION['id'];
 date_default_timezone_set('America/Sao_Paulo');
 $dateToday = date('m/d/Y h:i:s a', time());
 $dateToday = new DateTime($dateToday);
-$emDia = 0;
-$prestesAVencer = 0;
-$atrasado = 0;
+$emDiaReceita = 0;
+$prestesAVencerReceita = 0;
+$atrasadoReceita = 0;
+$emDiaDespesa = 0;
+$prestesAVencerDespesa = 0;
+$atrasadoDespesa = 0;
 
-$sql_dataVencimento = "SELECT vencimento FROM boletos
+$sql_dataVencimento = "SELECT vencimento, tipo FROM boletos
                             WHERE status = 'Pendente' 
                             AND userid = '$userid';";
 
@@ -29,13 +32,21 @@ if ($numRows > 0) {
     while ($row = mysqli_fetch_assoc($res_dataVencimento)) {
         $dataVencimento = new DateTime($row['vencimento']);
         $interval = date_diff($dateToday, $dataVencimento);
-        if ($interval->days > 7)
-            $emDia += 1;
-        else if ($interval->days < 0)
-            $prestesAVencer += 1;
-        else
-            $atrasado += 1;
-        
+        if ($row['tipo'] == 'Receita') {
+            if ($interval->days > 7)
+                $emDiaReceita += 1;
+            else if ($interval->days > 0)
+                $prestesAVencerReceita += 1;
+            else
+                $atrasadoReceita += 1;
+        } else {
+            if ($interval->days > 7)
+                $emDiaDespesa += 1;
+            else if ($interval->days > 0)
+                $prestesAVencerDespesa += 1;
+            else
+                $atrasadoDespesa += 1;
+        }
     }
 }
 
@@ -136,22 +147,25 @@ if ($numRows > 0) {
 						<a class="dropdown-item" href="#"> <span class="text-success"> <strong><i
 									class="fa fa-long-arrow-up fa-fw"></i>Boletos em Dia</strong>
 						</span>
-							<div class="dropdown-message small">Voce tem <?php print_r($emDia)?> boletos em dia</div>
+							<div class="dropdown-message small">Voce tem <?php print_r($emDiaReceita)?> boletos a receber <br>
+																e <?php print_r($emDiaDespesa)?> a pagar em dia</div>
 						</a>
 
 						<div class="dropdown-divider"></div>
 						<a class="dropdown-item" href="#"> <span class="text-danger"> <strong><i
 									class="fa fa-long-arrow-down fa-fw"></i>Boletos Atrasados</strong>
 						</span>
-							<div class="dropdown-message small">Voce tem <?php print_r($atrasado)?> boletos atrasados</div>
+							<div class="dropdown-message small">Voce tem <?php print_r($atrasadoReceita)?> boletos a receber <br>
+																e <?php print_r($atrasadoDespesa)?> a pagar atrasados</div>
 						</a>
 
 						<div class="dropdown-divider"></div>
 						<a class="dropdown-item" href="#"> <span class="text-warning"> <strong><i
-									class="fa fa-long-arrow-up fa-fw"></i>Boletos prÛximos do
+									class="fa fa-long-arrow-up fa-fw"></i>Boletos pr√≥ximos do
 									vencimento</strong>
 						</span>
-							<div class="dropdown-message small">Voce tem <?php print_r($prestesAVencer)?> boletos prestes a vencer.</div>
+							<div class="dropdown-message small">Voce tem <?php print_r($prestesAVencerReceita)?> boletos a receber <br>
+																e <?php print_r($prestesAVencerDespesa)?> a pagar prestes a vencer</div>
 						</a>
 					</div></li>
 
