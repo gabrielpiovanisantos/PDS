@@ -8,6 +8,8 @@
 		header("Location: index.php");
 		exit;
 	}
+	
+	$userid = $_SESSION['id'];
 
 	$msg = false;
 	$erro = false;
@@ -107,6 +109,47 @@
 			}
 		}
 	}
+	
+	date_default_timezone_set('America/Sao_Paulo');
+	$dateToday = date('m/d/Y h:i:s a', time());
+	$dateToday = new DateTime($dateToday);
+	$emDiaReceita = 0;
+	$prestesAVencerReceita = 0;
+	$atrasadoReceita = 0;
+	$emDiaDespesa = 0;
+	$prestesAVencerDespesa = 0;
+	$atrasadoDespesa = 0;
+	
+	$sql_dataVencimento = "SELECT vencimento, tipo FROM boletos
+                            WHERE status = 'Pendente'
+                            AND userid = '$userid';";
+	
+	$res_dataVencimento = mysqli_query($conn, $sql_dataVencimento);
+	$numRows = mysqli_num_rows($res_dataVencimento);
+	
+	// se retornar resultado
+	if ($numRows > 0) {
+	    while ($row = mysqli_fetch_assoc($res_dataVencimento)) {
+	        $dataVencimento = new DateTime($row['vencimento']);
+	        $interval = date_diff($dateToday, $dataVencimento);
+	        if ($row['tipo'] == 'Receita') {
+	            if ($interval->days > 7)
+	                $emDiaReceita += 1;
+	                else if ($interval->days > 0)
+	                    $prestesAVencerReceita += 1;
+	                    else
+	                        $atrasadoReceita += 1;
+	        } else {
+	            if ($interval->days > 7)
+	                $emDiaDespesa += 1;
+	                else if ($interval->days > 0)
+	                    $prestesAVencerDespesa += 1;
+	                    else
+	                        $atrasadoDespesa += 1;
+	        }
+	    }
+	}
+	
 ?>
 
 <!DOCTYPE html>
@@ -187,54 +230,48 @@
 				</li>
 			</ul>
 
-			<ul class="navbar-nav ml-auto">
-<!--
-				<li class="nav-item dropdown">
-					<a class="nav-link dropdown-toggle mr-lg-2" id="alertsDropdown" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-						<i class="fa fa-fw fa-bell"></i>
-						<span class="d-lg-none">Notificações
-							<span class="badge badge-pill badge-warning">6 New</span>
-						</span>
-						<span class="indicator text-warning d-none d-lg-block">
-							<i class="fa fa-fw fa-circle"></i>
-						</span>
-					</a>
+		<ul class="navbar-nav ml-auto">
 
-					<div class="dropdown-menu dropdown-menu-right" aria-labelledby="alertsDropdown">
+				<li class="nav-item dropdown"><a
+					class="nav-link dropdown-toggle mr-lg-2" id="alertsDropdown"
+					href="#" data-toggle="dropdown" aria-haspopup="true"
+					aria-expanded="false"> <i class="fa fa-fw fa-bell"></i> <span
+						class="d-lg-none">Notificações </span> <span
+						class="indicator text-warning d-none d-lg-block"> <i
+							class="fa fa-fw fa-circle"></i>
+					</span>
+				</a>
+
+					<div class="dropdown-menu dropdown-menu-right"
+						aria-labelledby="alertsDropdown">
 						<h6 class="dropdown-header">Notificações:</h6>
 						<div class="dropdown-divider"></div>
 
-						<a class="dropdown-item" href="#">
-							<span class="text-success">
-								<strong><i class="fa fa-long-arrow-up fa-fw"></i>Status Update</strong>
-							</span>
-							<span class="small float-right text-muted">11:21 AM</span>
-							<div class="dropdown-message small">This is an automated server response message. All systems are online.</div>
+						<a class="dropdown-item" href="#"> <span class="text-success"> <strong><i
+									class="fa fa-long-arrow-up fa-fw"></i>Boletos em Dia</strong>
+						</span>
+							<div class="dropdown-message small">Voce tem <?php print_r($emDiaReceita)?> boletos a receber <br>
+																e <?php print_r($emDiaDespesa)?> a pagar em dia</div>
 						</a>
 
 						<div class="dropdown-divider"></div>
-						<a class="dropdown-item" href="#">
-							<span class="text-danger">
-								<strong><i class="fa fa-long-arrow-down fa-fw"></i>Status Update</strong>
-							</span>
-							<span class="small float-right text-muted">11:21 AM</span>
-							<div class="dropdown-message small">This is an automated server response message. All systems are online.</div>
+						<a class="dropdown-item" href="#"> <span class="text-danger"> <strong><i
+									class="fa fa-long-arrow-down fa-fw"></i>Boletos Atrasados</strong>
+						</span>
+							<div class="dropdown-message small">Voce tem <?php print_r($atrasadoReceita)?> boletos a receber <br>
+																e <?php print_r($atrasadoDespesa)?> a pagar atrasados</div>
 						</a>
 
 						<div class="dropdown-divider"></div>
-						<a class="dropdown-item" href="#">
-							<span class="text-success">
-								<strong><i class="fa fa-long-arrow-up fa-fw"></i>Status Update</strong>
-							</span>
-							<span class="small float-right text-muted">11:21 AM</span>
-							<div class="dropdown-message small">This is an automated server response message. All systems are online.</div>
+						<a class="dropdown-item" href="#"> <span class="text-warning"> <strong><i
+									class="fa fa-long-arrow-up fa-fw"></i>Boletos próximos do
+									vencimento</strong>
+						</span>
+							<div class="dropdown-message small">Voce tem <?php print_r($prestesAVencerReceita)?> boletos a receber <br>
+																e <?php print_r($prestesAVencerDespesa)?> a pagar prestes a vencer</div>
 						</a>
+					</div></li>
 
-						<div class="dropdown-divider"></div>
-						<a class="dropdown-item small" href="#">Ver todas as notificações</a>
-					</div>
-				</li>
--->
 
 				<li class="nav-item">
 					<a class="nav-link" data-toggle="modal" data-target="#exampleModal"><i class="fa fa-fw fa-sign-out"></i>Sair</a>
