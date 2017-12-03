@@ -1,15 +1,15 @@
 <?php
 	session_start();
-	include_once("includes/conn.inc.php");
-	
+	include_once ("includes/conn.inc.php");
+
 	// verifica se o usuario realizou o login
 	if (!isset($_SESSION['id'])) {
 		header("Location: index.php");
-		exit;
+		exit();
 	}
 
 	$userid = $_SESSION['id'];
-	
+
 	date_default_timezone_set('America/Sao_Paulo');
 	$dateToday = date('m/d/Y h:i:s a', time());
 	$dateToday = new DateTime($dateToday);
@@ -19,39 +19,37 @@
 	$emDiaDespesa = 0;
 	$prestesAVencerDespesa = 0;
 	$atrasadoDespesa = 0;
-	
+
 	$sql_dataVencimento = "SELECT vencimento, tipo FROM boletos
-                            WHERE status = 'Pendente'
-                            AND userid = '$userid';";
-	
+							WHERE status = 'Pendente'
+							AND userid = '$userid';";
+
 	$res_dataVencimento = mysqli_query($conn, $sql_dataVencimento);
 	$numRows = mysqli_num_rows($res_dataVencimento);
-	
+
 	// se retornar resultado
 	if ($numRows > 0) {
-	    while ($row = mysqli_fetch_assoc($res_dataVencimento)) {
-	        $dataVencimento = new DateTime($row['vencimento']);
-	        $interval = date_diff($dateToday, $dataVencimento);
-	        if ($row['tipo'] == 'Receita') {
-	            if ($interval->days > 7)
-	                $emDiaReceita += 1;
-	                else if ($interval->days > 0)
-	                    $prestesAVencerReceita += 1;
-	                    else
-	                        $atrasadoReceita += 1;
-	        } else {
-	            if ($interval->days > 7)
-	                $emDiaDespesa += 1;
-	                else if ($interval->days > 0)
-	                    $prestesAVencerDespesa += 1;
-	                    else
-	                        $atrasadoDespesa += 1;
-	        }
-	    }
+		while ($row = mysqli_fetch_assoc($res_dataVencimento)) {
+			$dataVencimento = new DateTime($row['vencimento']);
+			$interval = date_diff($dateToday, $dataVencimento);
+			if ($row['tipo'] == 'Receita') {
+				if ($interval->d > 7 && $interval->invert == 0)
+					$emDiaReceita += 1;
+				else if ($interval->d > 0 && $interval->invert == 0)
+					$prestesAVencerReceita += 1;
+				else
+					$atrasadoReceita += 1;
+			} else {
+				if ($interval->d > 7 && $interval->invert == 0)
+					$emDiaDespesa += 1;
+				else if ($interval->d > 0 && $interval->invert == 0)
+					$prestesAVencerDespesa += 1;
+				else
+					$atrasadoDespesa += 1;
+			}
+		}
 	}
-	
 ?>
-
 
 <!DOCTYPE html>
 <html lang="pt-br">

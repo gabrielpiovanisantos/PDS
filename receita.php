@@ -32,16 +32,16 @@ if ($numRows > 0) {
         $dataVencimento = new DateTime($row['vencimento']);
         $interval = date_diff($dateToday, $dataVencimento);
         if ($row['tipo'] == 'Receita') {
-            if ($interval->days > 7)
+            if ($interval->d > 7 && $interval->invert == 0)
                 $emDiaReceita += 1;
-            else if ($interval->days > 0)
+            else if ($interval->d > 0 && $interval->invert == 0)
                 $prestesAVencerReceita += 1;
             else
                 $atrasadoReceita += 1;
         } else {
-            if ($interval->days > 7)
+            if ($interval->d > 7 && $interval->invert == 0)
                 $emDiaDespesa += 1;
-            else if ($interval->days > 0)
+            else if ($interval->d > 0 && $interval->invert == 0)
                 $prestesAVencerDespesa += 1;
             else
                 $atrasadoDespesa += 1;
