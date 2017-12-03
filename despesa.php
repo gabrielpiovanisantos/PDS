@@ -112,15 +112,6 @@
 						<span class="nav-link-text">Fluxo de Caixa</span>
 					</a>
 				</li>
-
-<!--
-				<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Charts">
-					<a class="nav-link" href="#">
-						<i class="fa fa-fw fa-area-chart"></i>
-						<span class="nav-link-text">Gráficos</span>
-					</a>
-				</li>
--->
 			</ul>
 
 			<ul class="navbar-nav sidenav-toggler">
@@ -148,30 +139,24 @@
 						<h6 class="dropdown-header">Notificações:</h6>
 						<div class="dropdown-divider"></div>
 
-						<a class="dropdown-item" href="#"> <span class="text-success"> <strong><i
-									class="fa fa-long-arrow-up fa-fw"></i>Boletos em Dia</strong>
+						<a class="dropdown-item" href="receita.php"> <span class="text-success"> <strong><i
+									class="fa fa-long-arrow-up fa-fw"></i>Receita</strong>
 						</span>
-							<div class="dropdown-message small">Voce tem <?php print_r($emDiaReceita)?> boletos a receber <br>
-																e <?php print_r($emDiaDespesa)?> a pagar em dia</div>
+							<div class="dropdown-message"><?php print_r($emDiaReceita)?> boletos em dia</div>
+							<div class="dropdown-message"><?php print_r($atrasadoReceita)?> boletos atrasados</div>
+							<div class="dropdown-message"><?php print_r($prestesAVencerReceita)?> boletos prestes a vencer</div>
 						</a>
 
 						<div class="dropdown-divider"></div>
-						<a class="dropdown-item" href="#"> <span class="text-danger"> <strong><i
-									class="fa fa-long-arrow-down fa-fw"></i>Boletos Atrasados</strong>
+						<a class="dropdown-item" href="despesa.php"> <span class="text-danger"> <strong><i
+									class="fa fa-long-arrow-down fa-fw"></i>Despesa</strong>
 						</span>
-							<div class="dropdown-message small">Voce tem <?php print_r($atrasadoReceita)?> boletos a receber <br>
-																e <?php print_r($atrasadoDespesa)?> a pagar atrasados</div>
+							<div class="dropdown-message"><?php print_r($emDiaDespesa)?> boletos em dia</div>
+							<div class="dropdown-message"><?php print_r($atrasadoDespesa)?> boletos atrasados</div>
+							<div class="dropdown-message"><?php print_r($prestesAVencerDespesa)?> boletos prestes a vencer</div>
 						</a>
-
-						<div class="dropdown-divider"></div>
-						<a class="dropdown-item" href="#"> <span class="text-warning"> <strong><i
-									class="fa fa-long-arrow-up fa-fw"></i>Boletos próximos do
-									vencimento</strong>
-						</span>
-							<div class="dropdown-message small">Voce tem <?php print_r($prestesAVencerReceita)?> boletos a receber <br>
-																e <?php print_r($prestesAVencerDespesa)?> a pagar prestes a vencer</div>
-						</a>
-					</div></li>
+					</div>
+				</li>
 
 
 				<li class="nav-item">
