@@ -21,7 +21,7 @@
 	$atrasadoDespesa = 0;
 	
 	$sql_dataVencimento = "SELECT vencimento, tipo FROM boletos
-                            WHERE status = 'Pendente'
+                            WHERE (status = 'Pendente' OR status = 'Atrasado')
                             AND userid = '$userid';";
 	
 	$res_dataVencimento = mysqli_query($conn, $sql_dataVencimento);
@@ -223,7 +223,7 @@
 										}										
 									
 										// busca pelos boletos de despesas a pagar
-										$sql = "SELECT id, nome, numero, valor, vencimento, status FROM boletos WHERE userid='$userid' AND tipo='Despesa' AND status='Pendente'";
+										$sql = "SELECT id, nome, numero, valor, vencimento, status FROM boletos WHERE userid='$userid' AND tipo='Despesa' AND (status='Pendente' OR status='Atrasado');";
 									
 										// se a busca retornar resultados
 										if ($res = mysqli_query($conn, $sql)) {
@@ -232,6 +232,16 @@
 												$vencimento = str_replace("-", "/", $row['vencimento']);
 												$valor = number_format($row['valor'], 2, ",", ".");
 												
+												if ($row['status'] == 'Pago') {
+													$icon = "<i class='fa fa-circle bola-verde' aria-hidden='true'> ";
+												}
+												elseif ($row['status'] == 'Pendente') {
+													$icon = "<i class='fa fa-circle bola-amarela' aria-hidden='true'> ";
+												}
+												elseif ($row['status'] == 'Atrasado') {
+													$icon = "<i class='fa fa-circle bola-vermelha' aria-hidden='true'> ";
+												}
+
 												// link do boleto
 												$linkPdf = $row['numero']." <a href='upload/".$row['nome']."'><i class='fa fa-file-pdf-o' aria-hidden='true'></i></a>";
 												
@@ -251,7 +261,7 @@
 															</div>";
 												
 												// imprime as linhas da tabela
-												printf("<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>", $linkPdf, $valor, $vencimento, $row['status'], $alterar);
+												printf("<tr><td>%s</td><td>%s</td><td>%s</td><td>%s<span>%s</span></td><td>%s</td></tr>", $linkPdf, $valor, $vencimento, $icon, $row['status'], $alterar);
 											}
 											
 											mysqli_free_result($res);

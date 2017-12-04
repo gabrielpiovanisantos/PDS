@@ -20,7 +20,7 @@ $prestesAVencerDespesa = 0;
 $atrasadoDespesa = 0;
 
 $sql_dataVencimento = "SELECT vencimento, tipo FROM boletos
-                            WHERE status = 'Pendente'
+                            WHERE (status = 'Pendente' OR status = 'Atrasado')
                             AND userid = '$userid';";
 
 $res_dataVencimento = mysqli_query($conn, $sql_dataVencimento);
@@ -198,41 +198,51 @@ if ($numRows > 0) {
 								</tfoot>
 								<tbody>
 									<?php
-        // altera o status do boleto selecionado
-        if (isset($_GET['id']) && isset($_GET['status'])) {
-            $id = $_GET['id'];
-            $status = mysqli_real_escape_string($conn, $_GET['status']);
-            
-            if ($status == "Pago") {
-                $sql = "UPDATE boletos SET status='Pago' WHERE id='$id';";
-                mysqli_query($conn, $sql);
-            } else if ($status == "Pendente") {
-                $sql = "UPDATE boletos SET status='Pendente' WHERE id='$id';";
-                mysqli_query($conn, $sql);
-            } else if ($status == "Atrasado") {
-                $sql = "UPDATE boletos SET status='Atrasado' WHERE id='$id';";
-                mysqli_query($conn, $sql);
-            }
-        }
-        
-        // busca pelos boletos de receitas a receber
-        $sql = "SELECT id, nome, numero, valor, vencimento, status FROM boletos WHERE userid='$userid' AND tipo='Receita' AND status='Pendente'";
-        
-        // se a busca retornar resultados
-        if ($res = mysqli_query($conn, $sql)) {
-            // percorre pelos resultados
-            while ($row = mysqli_fetch_assoc($res)) {
-                $vencimento = str_replace("-", "/", $row['vencimento']);
-                $valor = number_format($row['valor'], 2, ",", ".");
-                
-                // link do boleto
-                $linkPdf = $row['numero'] . " <a href='upload/" . $row['nome'] . "'><i class='fa fa-file-pdf-o' aria-hidden='true'></i></a>";
-                
-                /*
-                 * links para alterar os status dos boletos.
-                 * passa por parametro o id do boleto e o novo status
-                 */
-                $alterar = "<div>
+										// altera o status do boleto selecionado
+										if (isset($_GET['id']) && isset($_GET['status'])) {
+											$id = $_GET['id'];
+											$status = mysqli_real_escape_string($conn, $_GET['status']);
+
+											if ($status == "Pago") {
+												$sql = "UPDATE boletos SET status='Pago' WHERE id='$id';";
+												mysqli_query($conn, $sql);
+											} else if ($status == "Pendente") {
+												$sql = "UPDATE boletos SET status='Pendente' WHERE id='$id';";
+												mysqli_query($conn, $sql);
+											} else if ($status == "Atrasado") {
+												$sql = "UPDATE boletos SET status='Atrasado' WHERE id='$id';";
+												mysqli_query($conn, $sql);
+											}
+										}
+
+										// busca pelos boletos de receitas a receber
+										$sql = "SELECT id, nome, numero, valor, vencimento, status FROM boletos WHERE userid='$userid' AND tipo='Receita' AND (status='Pendente' OR status='Atrasado');";
+
+										// se a busca retornar resultados
+										if ($res = mysqli_query($conn, $sql)) {
+											// percorre pelos resultados
+											while ($row = mysqli_fetch_assoc($res)) {
+												$vencimento = str_replace("-", "/", $row['vencimento']);
+												$valor = number_format($row['valor'], 2, ",", ".");
+
+												if ($row['status'] == 'Pago') {
+													$icon = "<i class='fa fa-circle bola-verde' aria-hidden='true'> ";
+												}
+												elseif ($row['status'] == 'Pendente') {
+													$icon = "<i class='fa fa-circle bola-amarela' aria-hidden='true'> ";
+												}
+												elseif ($row['status'] == 'Atrasado') {
+													$icon = "<i class='fa fa-circle bola-vermelha' aria-hidden='true'> ";
+												}
+
+												// link do boleto
+												$linkPdf = $row['numero'] . " <a href='upload/" . $row['nome'] . "'><i class='fa fa-file-pdf-o' aria-hidden='true'></i></a>";
+
+												/*
+												 * links para alterar os status dos boletos.
+												 * passa por parametro o id do boleto e o novo status
+												 */
+												$alterar = "<div>
 																<i class='fa fa-calendar-check-o' aria-hidden='true'></i>
 																<a href=receita.php?id=" . $row['id'] . "&status=Pago>Pago</a>
 															</div>
@@ -244,14 +254,14 @@ if ($numRows > 0) {
 																<i class='fa fa-calendar-times-o' aria-hidden='true'></i>
 																<a href=receita.php?id=" . $row['id'] . "&status=Atrasado>Atrasado</a>
 															</div>";
-                
-                // imprime as linhas da tabela
-                printf("<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>", $linkPdf, $valor, $vencimento, $row['status'], $alterar);
-            }
-            
-            mysqli_free_result($res);
-        }
-        ?>
+
+												// imprime as linhas da tabela
+												printf("<tr><td>%s</td><td>%s</td><td>%s</td><td>%s<span>%s</span></td><td>%s</td></tr>", $linkPdf, $valor, $vencimento, $icon, $row['status'], $alterar);
+											}
+
+											mysqli_free_result($res);
+										}
+										?>
 								</tbody>
 							</table>
 						</div>

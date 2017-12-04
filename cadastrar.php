@@ -121,7 +121,7 @@
 	$atrasadoDespesa = 0;
 	
 	$sql_dataVencimento = "SELECT vencimento, tipo FROM boletos
-                            WHERE status = 'Pendente'
+                            WHERE (status = 'Pendente' OR status = 'Atrasado')
                             AND userid = '$userid';";
 	
 	$res_dataVencimento = mysqli_query($conn, $sql_dataVencimento);

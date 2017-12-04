@@ -20,3 +20,29 @@ input:required:valid {
 .item-form {
 	padding: 10px;
 }
+
+.bola-amarela {
+	color: #ffc107;
+}
+
+.bola-vermelha {
+	color: red;
+}
+
+.bola-verde {
+	color: green;
+}
+
+.bola-amarela span, .bola-verde span, .bola-vermelha span {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/*
+.fa-circle {
+	color: red;
+}
+
+.fa-circle-red {
+  content: "\f111";
+  color: red;
+}*/
