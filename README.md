@@ -4,6 +4,10 @@
   
   A versão final está disponível e pode ser utilizada no seguinte endereço: https://boletos.000webhostapp.com
   
+  Usuário teste:
+  - email: luciane.silva@msn.com
+  - senha: senha
+  
   Slide da apresentação final: https://goo.gl/bFzc4Y
 
   Acesse a nossa Wiki para informações mais especificas.
