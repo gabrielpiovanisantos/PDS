@@ -8,6 +8,6 @@
   - email: luciane.silva@msn.com
   - senha: senha
   
-  Slide da apresentação final: https://goo.gl/bFzc4Y
+  Slide da apresentação final: https://goo.gl/pFM2UL
 
   Acesse a nossa Wiki para informações mais especificas.
