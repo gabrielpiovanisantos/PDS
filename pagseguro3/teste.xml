@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<authorizationRequest>
+  <redirectURL>http://localhost/PDS/pagseguro3/notification.php</redirectURL>
+  <permissions>
+    <code>CREATE_CHECKOUTS</code>
+    <code>RECEIVE_TRANSACTION_NOTIFICATIONS</code>
+    <code>DIRECT_PAYMENT</code>
+  </permissions>
+</authorizationRequest>
